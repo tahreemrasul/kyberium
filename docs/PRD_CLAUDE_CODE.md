@@ -186,6 +186,51 @@ Start with tag-based retrieval or a small local embedding index and evaluate aga
 
 This is **different from wardrobe retrieval**: fashion knowledge describes principles; wardrobe retrieval identifies real owned garments. Do not contaminate one with unsupported inventory guesses.
 
+
+## 8A. Future fashion-knowledge retrieval contract (IMPLEMENT INTERFACE NOW; INDEX COMES LATER)
+
+A separate research/data workstream will gather legally usable fashion styling knowledge and construct a substantial searchable index. **Claude Code must not scrape publications, build the full index, or block MVP development waiting for it.** Treat this as an optional, replaceable dependency of outfit reasoning.
+
+### Required integration seam
+Implement a small `FashionKnowledgeRetriever` abstraction with an async `search(query, filters, topK)` method. Return typed `FashionKnowledgeHit` records:
+```ts
+type FashionKnowledgeQuery = {
+  concepts: string[];              // silhouette, proportion, layering, palette, formality
+  occasion?: string;
+  garmentCategories?: string[];
+  styleTags?: string[];
+  topK?: number;
+};
+type FashionKnowledgeHit = {
+  id: string;
+  text: string;                    // concise styling principle, not an unsupported assertion
+  score?: number;                  // ranking value, not a probability of correctness
+  tags: string[];
+  sourceTitle?: string;
+  sourceUrl?: string;
+  license?: string;
+  provenance?: string;
+};
+```
+Adapt naming to the actual language/backend (Pydantic in Python recommended), but preserve the semantics.
+
+### Implementations
+- `NoOpFashionKnowledgeRetriever`: default for initial deployed MVP, returns [] safely.
+- `LocalFashionKnowledgeRetriever`: optional implementation for a small curated JSON dataset, tag/keyword match.
+- `VectorFashionKnowledgeRetriever`: future adapter for chosen store (pgvector, Qdrant, Vertex AI Vector Search, etc.); **do not couple business logic to a vector database provider yet**.
+
+### Execution and failure behavior
+1. After inspiration parsing, generate retrieval queries from outfit attributes, not a raw image blob. Keep query focused on the styling decisions the agent is making.
+2. Optionally retrieve a few short, relevant styling principles (e.g. 3–5) before final outfit composition; cap token budget.
+3. If unconfigured, empty, slow or failing, run the **same core wardrobe-matching workflow** with no fashion hits. Fashion retrieval must never be required for garment ingestion, wardrobe lookup, or generation.
+4. Include source IDs/URLs as metadata with any retrieved principles and never fabricate citations.
+5. Store the source dataset's attribution, license and URL and enforce permitted use. Deep research can help locate knowledge, but research results are not themselves proof of indexing/reproduction rights.
+6. Provide a configuration flag (e.g. `FASHION_KNOWLEDGE_BACKEND=none|local|vector`) and a dedicated retriever module. Unit test both retrieved and empty/error paths.
+7. Keep retrieved styling principles **separate from wardrobe inventory records**. The knowledge index cannot create new “owned” garments.
+8. Future vector infrastructure will be wired in via configuration, not through changes to endpoint contracts or frontend screens.
+
+**Acceptance criterion for current implementation:** the styling pipeline imports the retriever interface, continues to work with the no-op implementation, and can consume a list of knowledge hits when supplied by a test double. Full-scale indexing is intentionally deferred.
+
 ## 9. Testing & evaluation
 Create 10–15 labeled cases, with owned IDs and expected outfit constraints:
 - exact piece match; same silhouette different color; creative but context-appropriate substitution;
