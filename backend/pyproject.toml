@@ -1,0 +1,40 @@
+[project]
+name = "rewear-api"
+version = "0.1.0"
+description = "Rewear API — reuse-first AI styling on Gemini"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.143.3",
+    "google-cloud-firestore>=2.34.1",
+    "google-cloud-storage>=3.17.1",
+    "google-genai>=2.31.0",
+    "pillow>=12.3.0",
+    "pydantic-settings>=2.16.0",
+    "python-multipart>=0.0.32",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "ruff>=0.17.1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/demo/illustrations.py" = ["E501"]
