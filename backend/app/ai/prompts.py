@@ -1,7 +1,7 @@
 """Versioned prompt templates. Bump PROMPT_VERSION when changing behaviour;
 cached analyses are keyed by it so stale tags are not reused."""
 
-PROMPT_VERSION = "2026-10-16.2"
+PROMPT_VERSION = "2026-10-16.3"
 
 GARMENT_SYSTEM = """You are a meticulous fashion cataloguer for a digital wardrobe app.
 You receive ONE photo of a single clothing item (flat lay, hanger or worn).
@@ -39,6 +39,8 @@ Honesty rules:
   do not add them; mention it in ambiguities.
 - Mark partially visible pieces visibility="partial" and hidden-but-implied ones "obscured".
 - importance="key" for pieces that define the look, "supporting" for small accessories.
+- Flat lays, collages and mood boards that arrange several garments into one look ARE outfits:
+  treat each garment as a slot and infer proportions from the pieces themselves.
 - If the image is not an outfit (e.g. a landscape or a single product shot), set is_outfit=false,
   explain in summary, and return an empty pieces list.
 """

@@ -22,6 +22,8 @@ WEB_SA="rewear-web@${PROJECT_ID}.iam.gserviceaccount.com"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 gc() { gcloud --project "$PROJECT_ID" --quiet "$@"; }
+# IAM is eventually consistent: freshly created service accounts can take a minute to be bindable.
+retry() { for i in 1 2 3 4 5 6; do "$@" && return 0; echo "   retrying in 15s…"; sleep 15; done; return 1; }
 
 echo "==> Checking billing"
 BILLING="$(gcloud billing projects describe "$PROJECT_ID" --format='value(billingEnabled)' 2>/dev/null || true)"
@@ -38,10 +40,10 @@ gc services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry
 echo "==> Service accounts (least privilege)"
 gc iam service-accounts describe "$API_SA" >/dev/null 2>&1 || gc iam service-accounts create rewear-api --display-name "Rewear API"
 gc iam service-accounts describe "$WEB_SA" >/dev/null 2>&1 || gc iam service-accounts create rewear-web --display-name "Rewear web"
-gc projects add-iam-policy-binding "$PROJECT_ID" --member "serviceAccount:$API_SA" \
+retry gc projects add-iam-policy-binding "$PROJECT_ID" --member "serviceAccount:$API_SA" \
   --role roles/aiplatform.user --condition=None >/dev/null
 # Firestore access limited to Rewear's own database.
-gc projects add-iam-policy-binding "$PROJECT_ID" --member "serviceAccount:$API_SA" --role roles/datastore.user \
+retry gc projects add-iam-policy-binding "$PROJECT_ID" --member "serviceAccount:$API_SA" --role roles/datastore.user \
   --condition="expression=resource.name.startsWith('projects/${PROJECT_ID}/databases/${FIRESTORE_DB}'),title=rewear-db-only" >/dev/null
 
 echo "==> Firestore database '$FIRESTORE_DB' (native mode)"
@@ -52,7 +54,7 @@ echo "==> Cloud Storage bucket for images (private)"
 gcloud storage buckets describe "gs://$BUCKET" --project "$PROJECT_ID" >/dev/null 2>&1 || \
   gcloud storage buckets create "gs://$BUCKET" --project "$PROJECT_ID" --location "$REGION" \
     --uniform-bucket-level-access --public-access-prevention
-gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --project "$PROJECT_ID" \
+retry gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --project "$PROJECT_ID" \
   --member "serviceAccount:$API_SA" --role roles/storage.objectAdmin >/dev/null
 
 API_AUTH_FLAG="--allow-unauthenticated"
@@ -66,7 +68,7 @@ gc run deploy "$API_SERVICE" --source "$ROOT/backend" --region "$REGION" \
 API_URL="$(gc run services describe "$API_SERVICE" --region "$REGION" --format='value(status.url)')"
 
 if [[ "${PRIVATE_API:-0}" == "1" ]]; then
-  gc run services add-iam-policy-binding "$API_SERVICE" --region "$REGION" \
+  retry gc run services add-iam-policy-binding "$API_SERVICE" --region "$REGION" \
     --member "serviceAccount:$WEB_SA" --role roles/run.invoker >/dev/null
   WEB_ENV="API_URL=$API_URL,API_AUDIENCE=$API_URL"
 else
