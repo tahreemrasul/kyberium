@@ -105,7 +105,7 @@ def _explain(g: Garment, piece: InspirationPiece, reasons: list[str]) -> tuple[s
     if g.category != piece.category:
         changed.append(f"a {g.subcategory or g.category} in place of the {piece.subcategory or piece.category}")
     detail = "; ".join(preserved[:2]) if preserved else "it fills the same role in the outfit"
-    text = f"Your {g.name.lower()} stands in for the {piece.description.rstrip('.').lower()} — {detail}."
+    text = f"Your {g.name.lower()} can stand in for the {piece.description.rstrip('.').lower()} — {detail}."
     return text, preserved, changed
 
 

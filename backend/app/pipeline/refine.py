@@ -27,9 +27,10 @@ def swap_item(gen: Generation, look_id: str, old_id: str, new_garment: Garment) 
     if any(it.garment_id == new_garment.id for it in look.items):
         raise ApiError(400, "invalid_swap", "That garment is already in this look.")
     old = look.items[idx]
-    if new_garment.category != old.garment.category and not (
-        {new_garment.category, old.garment.category} <= {"top", "outerwear"}
-    ):
+    pair = {new_garment.category, old.garment.category}
+    top = new_garment if new_garment.category == "top" else old.garment
+    layer_swap = pair == {"top", "outerwear"} and top.layer == "mid"  # an open knit can play an outer layer
+    if new_garment.category != old.garment.category and not layer_swap:
         raise ApiError(400, "invalid_swap", f"Pick another {old.garment.category} to swap in.")
 
     piece = next((p for p in gen.analysis.pieces if p.slot_id == old.replaces_slot_id), None)
