@@ -96,7 +96,9 @@ def check(case: dict, gen: Generation | None, error: ApiError | None, wardrobe: 
         results += [(f"{slot} -> {gid}", sm.get(slot) == gid) for slot, gid in exp["closest_slots"].items()]
     if "closest_slot_in" in exp and closest:
         sm = slot_map(closest)
-        results += [(f"{slot} in {allowed}", sm.get(slot) in allowed) for slot, allowed in exp["closest_slot_in"].items()]
+        results += [
+            (f"{slot} in {allowed}", sm.get(slot) in allowed) for slot, allowed in exp["closest_slot_in"].items()
+        ]
     if "covered_slots" in exp and closest:
         results.append(("key slots covered", set(exp["covered_slots"]) <= {i.replaces_slot_id for i in closest.items}))
     for slot, cats in exp.get("slot_covered_by_categories", {}).items():
@@ -122,8 +124,12 @@ def check(case: dict, gen: Generation | None, error: ApiError | None, wardrobe: 
         results.append(("forbidden garments absent", not set(exp["forbidden_garments"]) & set(owned_ids)))
     if "required_garments" in exp:
         req = set(exp["required_garments"])
-        results.append(("required garments in every look", bool(looks) and all(
-            req <= {i.garment_id for i in lk.items} for lk in looks)))
+        results.append(
+            (
+                "required garments in every look",
+                bool(looks) and all(req <= {i.garment_id for i in lk.items} for lk in looks),
+            )
+        )
     if "distinct_looks" in exp:
         sets = {frozenset(i.garment_id for i in lk.items) for lk in looks}
         results.append((f"{exp['distinct_looks']} distinct looks", len(sets) >= exp["distinct_looks"]))
@@ -144,8 +150,14 @@ async def run_case(case: dict, live: bool) -> dict:
     gen, error = None, None
     try:
         gen = await run_pipeline(
-            ai=ai, settings=settings, retriever=get_retriever(), wardrobe=wardrobe, analysis=analysis, prefs=prefs,
-            inspiration_id="eval", inspiration_image_url="/eval",
+            ai=ai,
+            settings=settings,
+            retriever=get_retriever(),
+            wardrobe=wardrobe,
+            analysis=analysis,
+            prefs=prefs,
+            inspiration_id="eval",
+            inspiration_image_url="/eval",
         )
     except ApiError as exc:
         error = exc
@@ -169,7 +181,7 @@ def report(results: list[dict], live: bool) -> str:
         "",
         f"- Cases passed: **{passed}/{len(results)}**",
         f"- Checks passed: **{sum(checks)}/{len(checks)}**",
-        f"- Owned-garment validity: every returned garment id is checked per case (target 100%).",
+        "- Owned-garment validity: every returned garment id is checked per case (target 100%).",
         f"- Looks needing no purchase: {sum(not lk.impact.purchase_needed for g in gens for lk in g.looks)}/{n_looks}"
         " (descriptive, not a target)",
         "",
@@ -196,7 +208,9 @@ def report(results: list[dict], live: bool) -> str:
         for lk in g.looks:
             lines.append(f"**{lk.title}** — {lk.impact.headline}\n")
             lines += [f"- {it.replaces_slot_id or 'extra'} <- {it.garment.name}: {it.explanation}" for it in lk.items]
-            lines += [f"- GAP {gp.slot_id} ({'essential' if gp.essential else 'optional'}): {gp.reason}" for gp in lk.gaps]
+            lines += [
+                f"- GAP {gp.slot_id} ({'essential' if gp.essential else 'optional'}): {gp.reason}" for gp in lk.gaps
+            ]
             lines.append("")
     return "\n".join(lines)
 

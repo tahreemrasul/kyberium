@@ -38,3 +38,4 @@ ignore = ["B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "app/demo/illustrations.py" = ["E501"]
+"evals/run_evals.py" = ["E501"]

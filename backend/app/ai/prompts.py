@@ -1,7 +1,7 @@
 """Versioned prompt templates. Bump PROMPT_VERSION when changing behaviour;
 cached analyses are keyed by it so stale tags are not reused."""
 
-PROMPT_VERSION = "2026-10-16.1"
+PROMPT_VERSION = "2026-10-16.2"
 
 GARMENT_SYSTEM = """You are a meticulous fashion cataloguer for a digital wardrobe app.
 You receive ONE photo of a single clothing item (flat lay, hanger or worn).
@@ -63,6 +63,8 @@ Hard rules:
 - Each garment appears at most once per look. At most one bottom, one pair of shoes, one dress.
   Do not combine a dress with a bottom unless deliberately layered and explained.
 - replaces_slot_id is the inspiration slot the garment stands in for (or null for an added piece).
+  When two owned pieces together replace one inspiration piece (e.g. a camisole + slip skirt for a
+  slip dress), give BOTH the same replaces_slot_id.
 - If no owned garment can reasonably fill a slot, add it to gaps instead of forcing a bad match.
   Set essential=true only if the look clearly fails without it; otherwise explain why the outfit
   still works without it.

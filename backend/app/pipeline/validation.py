@@ -121,6 +121,36 @@ def build_look(
             )
         )
 
+    # "Keep this piece" is a hard user constraint: if the composer dropped a kept garment,
+    # put it back in place of the item in the same category (or in a slot it fits).
+    for gid in prefs.keep_garment_ids:
+        g = wardrobe.get(gid)
+        if g is None or gid in used:
+            continue
+        idx = next((i for i, it in enumerate(items) if it.garment.category == g.category), None)
+        slot = (
+            items[idx].replaces_slot_id
+            if idx is not None
+            else next((p.slot_id for p in analysis.pieces if p.category == g.category), None)
+        )
+        if idx is None and slot is None:
+            continue
+        kept = LookItem(
+            garment_id=g.id,
+            garment=g,
+            replaces_slot_id=slot,
+            replaces_description=slots[slot].description if slot else None,
+            explanation=f"Your {g.name.lower()} stays in the look, as you asked.",
+            preserved=[],
+            changed=[],
+        )
+        if idx is None:
+            items.append(kept)
+        else:
+            used.discard(items[idx].garment_id)
+            items[idx] = kept
+        used.add(g.id)
+
     if not items:
         return None
     items.sort(key=lambda it: _DISPLAY_ORDER.get(it.garment.category, 9))

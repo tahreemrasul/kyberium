@@ -109,6 +109,17 @@ def test_gaps_and_sourcing_hint_follow_shopping_preference(wardrobe):
     assert accessory_gap.essential is False
 
 
+def test_kept_garment_is_enforced(wardrobe):
+    composed = ComposedLook(
+        strategy="closest",
+        title="T",
+        items=[item("s_camel_blazer", "outerwear-1"), item("s_brown_loafers", "shoes-1")],
+    )
+    look = build_look(composed, wardrobe, CAMEL, StylePreferences(keep_garment_ids=["s_black_boots"]))
+    ids = [i.garment_id for i in look.items]
+    assert "s_black_boots" in ids and "s_brown_loafers" not in ids
+
+
 def test_empty_or_all_invalid_look_is_dropped(wardrobe):
     assert (
         build_look(

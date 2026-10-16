@@ -91,3 +91,5 @@ def test_inline_schema_has_no_refs():
     s = json.dumps(inline_schema(CompositionResult))
     assert "$ref" not in s and "$defs" not in s
     assert "garment_id" in s
+    look = inline_schema(CompositionResult)["properties"]["looks"]["items"]
+    assert set(look["required"]) <= set(look["properties"])  # a property named "title" must survive

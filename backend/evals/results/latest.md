@@ -9,8 +9,8 @@ Checks are deterministic. Candidate `score` values are heuristic ranking signals
 
 | Case | Result | Failed checks | Latency |
 |---|---|---|---|
-| exact-camel-work | PASS | — | 16 ms |
-| same-silhouette-different-colour | PASS | — | 10 ms |
+| exact-camel-work | PASS | — | 18 ms |
+| same-silhouette-different-colour | PASS | — | 11 ms |
 | aesthetic-substitute-weekend | PASS | — | 9 ms |
 | category-substitute-dress | PASS | — | 5 ms |
 | multiple-substitutes-distinct | PASS | — | 11 ms |

@@ -47,7 +47,9 @@ def inline_schema(model: type[BaseModel]) -> dict[str, Any]:
         if isinstance(node, dict):
             if "$ref" in node:
                 return walk(copy.deepcopy(defs[node["$ref"].split("/")[-1]]))
-            return {k: walk(v) for k, v in node.items() if k not in ("title", "default")}
+            # Drop "title"/"default" annotations (scalars/lists), but keep properties that happen to be
+            # named "title" — those are sub-schemas (dicts).
+            return {k: walk(v) for k, v in node.items() if k not in ("title", "default") or isinstance(v, dict)}
         if isinstance(node, list):
             return [walk(v) for v in node]
         return node

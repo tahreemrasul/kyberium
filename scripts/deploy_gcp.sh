@@ -15,6 +15,8 @@ API_SERVICE="${API_SERVICE:-rewear-api}"
 WEB_SERVICE="${WEB_SERVICE:-rewear-web}"
 BUCKET="${BUCKET:-${PROJECT_ID}-rewear-media}"
 GEMINI_MODEL="${GEMINI_MODEL:-gemini-2.5-flash}"
+# A dedicated named database keeps Rewear data separate from other apps in the same project.
+FIRESTORE_DB="${FIRESTORE_DB:-rewear}"
 API_SA="rewear-api@${PROJECT_ID}.iam.gserviceaccount.com"
 WEB_SA="rewear-web@${PROJECT_ID}.iam.gserviceaccount.com"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -22,7 +24,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 gc() { gcloud --project "$PROJECT_ID" --quiet "$@"; }
 
 echo "==> Checking billing"
-if [[ "$(gcloud billing projects describe "$PROJECT_ID" --format='value(billingEnabled)' 2>/dev/null)" != "True" ]]; then
+BILLING="$(gcloud billing projects describe "$PROJECT_ID" --format='value(billingEnabled)' 2>/dev/null || true)"
+if [[ "$BILLING" == "False" ]]; then
   echo "Billing is not enabled on $PROJECT_ID. Link a billing account first:" >&2
   echo "  gcloud billing projects link $PROJECT_ID --billing-account=XXXXXX-XXXXXX-XXXXXX" >&2
   exit 1
@@ -35,13 +38,15 @@ gc services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry
 echo "==> Service accounts (least privilege)"
 gc iam service-accounts describe "$API_SA" >/dev/null 2>&1 || gc iam service-accounts create rewear-api --display-name "Rewear API"
 gc iam service-accounts describe "$WEB_SA" >/dev/null 2>&1 || gc iam service-accounts create rewear-web --display-name "Rewear web"
-for role in roles/aiplatform.user roles/datastore.user; do
-  gc projects add-iam-policy-binding "$PROJECT_ID" --member "serviceAccount:$API_SA" --role "$role" --condition=None >/dev/null
-done
+gc projects add-iam-policy-binding "$PROJECT_ID" --member "serviceAccount:$API_SA" \
+  --role roles/aiplatform.user --condition=None >/dev/null
+# Firestore access limited to Rewear's own database.
+gc projects add-iam-policy-binding "$PROJECT_ID" --member "serviceAccount:$API_SA" --role roles/datastore.user \
+  --condition="expression=resource.name.startsWith('projects/${PROJECT_ID}/databases/${FIRESTORE_DB}'),title=rewear-db-only" >/dev/null
 
-echo "==> Firestore (native mode)"
-gc firestore databases describe --database="(default)" >/dev/null 2>&1 || \
-  gc firestore databases create --database="(default)" --location="$REGION" --type=firestore-native
+echo "==> Firestore database '$FIRESTORE_DB' (native mode)"
+gc firestore databases describe --database="$FIRESTORE_DB" >/dev/null 2>&1 || \
+  gc firestore databases create --database="$FIRESTORE_DB" --location="$REGION" --type=firestore-native
 
 echo "==> Cloud Storage bucket for images (private)"
 gcloud storage buckets describe "gs://$BUCKET" --project "$PROJECT_ID" >/dev/null 2>&1 || \
@@ -57,7 +62,7 @@ echo "==> Deploying API ($API_SERVICE)"
 gc run deploy "$API_SERVICE" --source "$ROOT/backend" --region "$REGION" \
   --service-account "$API_SA" $API_AUTH_FLAG \
   --memory 1Gi --cpu 1 --timeout 300 --concurrency 20 --min-instances 0 --max-instances 5 \
-  --set-env-vars "AI_BACKEND=vertex,GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=global,GEMINI_MODEL=$GEMINI_MODEL,STORAGE_BACKEND=gcp,GCS_BUCKET=$BUCKET,FASHION_KNOWLEDGE_BACKEND=local,COMPOSER_FALLBACK=rules"
+  --set-env-vars "AI_BACKEND=vertex,GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=global,GEMINI_MODEL=$GEMINI_MODEL,STORAGE_BACKEND=gcp,GCS_BUCKET=$BUCKET,FIRESTORE_DATABASE=$FIRESTORE_DB,FASHION_KNOWLEDGE_BACKEND=local,COMPOSER_FALLBACK=rules"
 API_URL="$(gc run services describe "$API_SERVICE" --region "$REGION" --format='value(status.url)')"
 
 if [[ "${PRIVATE_API:-0}" == "1" ]]; then
