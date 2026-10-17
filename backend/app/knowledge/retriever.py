@@ -206,6 +206,10 @@ def get_retriever() -> FashionKnowledgeRetriever:
     if s.fashion_knowledge_backend == "local":
         path = s.fashion_knowledge_path or DEFAULT_DATASET
         try:
+            if str(path).endswith(".jsonl"):  # the team's Rewear Fashion Knowledge corpus (schema v0.1.0)
+                from app.knowledge.corpus import CorpusFashionKnowledgeRetriever
+
+                return CorpusFashionKnowledgeRetriever.from_path(path)
             return LocalFashionKnowledgeRetriever.from_path(path)
         except Exception as exc:
             log.warning("could not load knowledge dataset %s: %s", path, exc)
