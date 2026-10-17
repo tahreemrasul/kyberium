@@ -638,5 +638,100 @@ SAMPLE_INSPIRATIONS: list[dict] = [
     ),
 ]
 
+# Outfit DNA for the sample inspirations (hand-reviewed), merged into the analyses above.
+_DNA: dict[str, dict] = {
+    "insp_camel_work": dict(
+        essential_traits=[
+            "relaxed tailored top layer over a clean base",
+            "straight, elongated leg line",
+            "minimal neutral palette",
+            "polished but easy smart-casual",
+        ],
+        flexible_traits=["exact blazer colour", "tee vs. simple knit", "bag style"],
+        waist_definition="undefined — the open blazer skims past the hip",
+        volume_balance="volume up top (oversized blazer) balanced by a slim straight trouser",
+        color_contrast="medium: warm camel and crisp white against black",
+        materials=["matte suiting against soft jersey", "smooth leather accents"],
+        styling_details=["blazer worn open", "tee tucked loosely at the front"],
+        pieces={
+            "outerwear-1": ("matte wool-look suiting", "oversized, hip-length", ["worn open"]),
+            "top-1": ("soft cotton jersey", "straight", ["loosely tucked"]),
+            "bottom-1": ("smooth suiting", "straight, full-length", []),
+            "shoes-1": ("polished leather", "low profile", []),
+            "accessory-1": ("structured leather", "structured", []),
+        },
+    ),
+    "insp_weekend_layers": dict(
+        essential_traits=[
+            "relaxed layered top half",
+            "casual straight-leg base",
+            "earthy, soft palette",
+            "effortless weekend ease",
+        ],
+        flexible_traits=["exact jacket colour", "knit texture", "sneaker style"],
+        waist_definition="undefined — layers fall straight",
+        volume_balance="soft volume on top from layers, clean straight leg below",
+        color_contrast="low to medium: olive and cream with light denim",
+        materials=["utility cotton over chunky knit", "light denim"],
+        styling_details=["overshirt worn open as a jacket"],
+        pieces={
+            "outerwear-1": ("washed cotton twill", "boxy", ["worn open"]),
+            "top-1": ("soft knit", "relaxed", []),
+            "bottom-1": ("light rigid denim", "straight", ["full length"]),
+            "shoes-1": ("smooth leather", "low-top", []),
+        },
+    ),
+    "insp_emerald_evening": dict(
+        essential_traits=[
+            "long fluid column",
+            "sheen against a tough edge",
+            "short structured layer over a long soft line",
+            "evening polish",
+        ],
+        flexible_traits=["exact jewel colour", "heel style", "jewellery"],
+        waist_definition="soft — the slip skims the body, jacket ends at the waist",
+        volume_balance="cropped, structured top layer over a long, fluid lower line",
+        color_contrast="high: deep emerald against black",
+        materials=["fluid satin against leather"],
+        styling_details=["jacket worn open over the dress"],
+        pieces={
+            "dress-1": ("fluid satin", "bias-cut column, midi", []),
+            "outerwear-1": ("smooth leather", "cropped, fitted", ["worn open"]),
+            "shoes-1": ("leather", "delicate, strappy", []),
+            "accessory-1": ("polished gold", "statement hoops", []),
+        },
+    ),
+    "insp_trench_travel": dict(
+        essential_traits=[
+            "long vertical line from the outer layer",
+            "polished neutral palette",
+            "comfortable but put-together",
+            "fluid wide leg",
+        ],
+        flexible_traits=["exact coat length", "sneaker style", "hat"],
+        waist_definition="belted at the natural waist",
+        volume_balance="long outer layer and wide trousers framing a fitted knit",
+        color_contrast="medium: beige and ecru with a navy anchor",
+        materials=["crisp cotton gabardine over fine knit", "fluid trousers"],
+        styling_details=["trench belted and worn open at the hem"],
+        pieces={
+            "outerwear-1": ("crisp gabardine", "long, belted", ["belted"]),
+            "top-1": ("fine-gauge knit", "slim", []),
+            "bottom-1": ("fluid woven", "high-rise wide-leg", []),
+            "shoes-1": ("smooth leather", "low-top", []),
+            "accessory-1": ("woven straw", "wide brim", []),
+        },
+    ),
+}
+
+for _insp in SAMPLE_INSPIRATIONS:
+    _dna = dict(_DNA[_insp["id"]])
+    _pieces = _dna.pop("pieces")
+    _analysis = _insp["analysis"].model_copy(update=_dna, deep=True)
+    for _piece in _analysis.pieces:
+        material, fit, details = _pieces[_piece.slot_id]
+        _piece.material_appearance, _piece.fit_volume, _piece.styling_details = material, fit, details
+    _insp["analysis"] = _analysis
+
 SAMPLE_GARMENT_IDS = {g["id"] for g in SAMPLE_GARMENTS}
 SAMPLE_INSPIRATION_INDEX = {i["id"]: i for i in SAMPLE_INSPIRATIONS}

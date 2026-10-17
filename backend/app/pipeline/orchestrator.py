@@ -1,8 +1,12 @@
 """The styling pipeline:
 
-inspiration analysis -> optional knowledge retrieval -> deterministic wardrobe
-retrieval -> Gemini (or labelled rule-based) composition -> validation ->
-gap & impact assessment -> persisted Generation.
+inspiration analysis (OutfitDNA) -> deterministic wardrobe retrieval -> optional knowledge
+retrieval -> composition -> validation -> gap & impact assessment -> persisted Generation.
+
+Composition engines, in order of preference:
+  1. agentic  — ADK stylist -> validation -> critic -> bounded refinement (app.stylist)
+  2. gemini   — single-pass composer (baseline; also the fallback if the workflow fails)
+  3. rules    — deterministic matcher, clearly labelled (demo mode / AI outage)
 """
 
 import logging
@@ -16,8 +20,10 @@ from app.knowledge import FashionKnowledgeRetriever, build_query, safe_search
 from app.pipeline.composer import compose_with_gemini, compose_with_rules
 from app.pipeline.retrieval import rank_candidates
 from app.pipeline.validation import build_looks
-from app.schemas import Garment, Generation, InspirationAnalysis, KnowledgeHitRef, StylePreferences
+from app.schemas import Garment, Generation, InspirationAnalysis, KnowledgeHitRef, StylePreferences, StylingTrace
 from app.storage import Repository
+from app.stylist.images import ImageLoader
+from app.stylist.workflow import AgenticError, run_agentic
 
 log = logging.getLogger("rewear")
 GENERATIONS = "generations"
@@ -25,6 +31,9 @@ GENERATIONS = "generations"
 DEMO_NOTE = (
     "Demo mode: Gemini isn't configured on this deployment, so these looks come from Rewear's "
     "rule-based matcher. Explanations are templated."
+)
+AGENTIC_FALLBACK_NOTE = (
+    "The stylist–critic review was unavailable, so these looks come from a single Gemini pass without critic review."
 )
 FALLBACK_NOTE = (
     "Our AI stylist was unavailable ({reason}), so these looks come from Rewear's rule-based "
@@ -44,6 +53,8 @@ async def run_pipeline(
     inspiration_image_url: str,
     generation_id: str | None = None,
     extra_note: str | None = None,
+    image_loader: ImageLoader | None = None,
+    agentic_runner=None,
 ) -> Generation:
     if not wardrobe:
         raise ApiError(409, "empty_wardrobe", "Your closet is empty. Add a few garments or load the sample wardrobe.")
@@ -74,7 +85,7 @@ async def run_pipeline(
     candidates = rank_candidates(analysis, list(wardrobe.values()), prefs)
     hits = await safe_search(
         retriever,
-        build_query(analysis, prefs),
+        build_query(analysis, prefs, candidates),
         top_k=settings.fashion_knowledge_top_k,
         timeout_s=settings.fashion_knowledge_timeout_s,
     )
@@ -83,7 +94,27 @@ async def run_pipeline(
     note: str | None = None
     looks = []
     no_match: str | None = None
-    if ai is not None:
+    trace: StylingTrace | None = None
+    use_agentic = ai is not None and settings.ai_enabled and settings.styling_engine == "agentic"
+    if use_agentic:
+        try:
+            result_a = await (agentic_runner or run_agentic)(
+                settings=settings,
+                analysis=analysis,
+                prefs=prefs,
+                wardrobe=wardrobe,
+                candidates=candidates,
+                knowledge=hits,
+                inspiration_image_url=inspiration_image_url,
+                image_loader=image_loader,
+            )
+            # An empty result is a legitimate, honest outcome (the critic rejected everything):
+            # it is returned as such, never replaced by unreviewed looks.
+            engine, looks, no_match, trace = "agentic", result_a.looks, result_a.no_match_reason, result_a.trace
+        except AgenticError as exc:
+            log.warning("agentic stylist failed, using single-pass composer: %s", exc)
+            note = AGENTIC_FALLBACK_NOTE
+    if ai is not None and engine != "agentic":
         try:
             result = await compose_with_gemini(ai, analysis, prefs, candidates, wardrobe, hits)
             looks = build_looks(result.looks, wardrobe, analysis, prefs)
@@ -97,7 +128,7 @@ async def run_pipeline(
                 raise ApiError(503, exc.code, exc.message, retryable=exc.retryable) from exc
             engine, note = "rules", FALLBACK_NOTE.format(reason=exc.message.rstrip("."))
             looks = []
-    else:
+    elif ai is None:
         note = DEMO_NOTE
 
     if engine == "rules":
@@ -122,6 +153,7 @@ async def run_pipeline(
         knowledge=[
             KnowledgeHitRef(id=h.id, text=h.text, source_title=h.source_title, source_url=h.source_url) for h in hits
         ],
+        trace=trace,
         created_at=now,
     )
 

@@ -9,7 +9,7 @@ import type { NextRequest } from "next/server";
 
 const FORWARD_REQUEST_HEADERS = ["authorization", "content-type", "accept"];
 const FORWARD_RESPONSE_HEADERS = ["content-type", "cache-control", "x-content-type-options", "content-security-policy"];
-const TIMEOUT_MS = 120_000;
+const TIMEOUT_MS = 170_000;
 
 let idToken: { value: string; expires: number } | null = null;
 

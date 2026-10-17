@@ -118,6 +118,7 @@ def build_look(
                 explanation=ci.explanation.strip() or f"{g.name} completes the look.",
                 preserved=[s for s in ci.preserved if s.strip()][:5],
                 changed=[s for s in ci.changed if s.strip()][:5],
+                role=(ci.role or "").strip() or None,
             )
         )
 
@@ -190,6 +191,10 @@ def build_look(
         styling_tip=composed.styling_tip,
         impact=compute_impact(items, gaps, analysis),
         warnings=list(dict.fromkeys(warnings)),
+        coherence=(composed.coherence or "").strip() or None,
+        styling_instructions=[x for x in composed.styling_instructions if x.strip()][:5],
+        preserved_traits=[x for x in composed.preserved_traits if x.strip()][:6],
+        deviations=[x for x in composed.deviations if x.strip()][:5],
     )
 
 

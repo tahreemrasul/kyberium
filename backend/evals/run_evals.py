@@ -16,11 +16,15 @@ the generated report.
 
 import argparse
 import asyncio
+import io
 import json
 import sys
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+from PIL import Image
 
 from app.ai.client import AIError, get_ai
 from app.config import Settings, get_settings
@@ -28,7 +32,8 @@ from app.demo import SAMPLE_INSPIRATION_INDEX, sample_garments
 from app.errors import ApiError
 from app.knowledge import get_retriever
 from app.pipeline.orchestrator import run_pipeline
-from app.schemas import Generation, InspirationAnalysis, StylePreferences
+from app.schemas import Garment, Generation, InspirationAnalysis, StylePreferences
+from app.stylist.images import make_image_loader
 
 HERE = Path(__file__).parent
 
@@ -46,9 +51,52 @@ class InjectedAI:
         return schema.model_validate(self.output)
 
 
+REAL_IMAGES = HERE.parent.parent / "images"  # the team's own garment photos (kept out of git)
+
+
+def real_garments() -> list[Garment]:
+    """Garments tagged by Gemini from real photos (evals/fixtures/real_wardrobe.json)."""
+    now = datetime.now(UTC)
+    out = []
+    for rec in json.loads((HERE / "fixtures" / "real_wardrobe.json").read_text()):
+        rec = dict(rec)
+        image = rec.pop("image_file")
+        path = REAL_IMAGES / image if image else None
+        out.append(
+            Garment(
+                **rec,
+                image_url=f"file://{path}" if path and path.exists() else "/none",
+                image_kind="photo",
+                source="upload",
+                created_at=now,
+                updated_at=now,
+            )
+        )
+    return out
+
+
+def eval_image_loader():
+    """Sample assets via the app loader; real photos straight from disk."""
+    base = make_image_loader(None)
+
+    async def load(url: str):
+        if url.startswith("file://"):
+            path = Path(url.removeprefix("file://"))
+            if path.is_file():
+                img = Image.open(path).convert("RGB")
+                img.thumbnail((384, 384))
+                buf = io.BytesIO()
+                img.save(buf, format="JPEG", quality=82)
+                return buf.getvalue(), "image/jpeg"
+            return None
+        return await base(url)
+
+    return load
+
+
 def build_wardrobe(spec: dict | None) -> dict:
-    items = sample_garments()
     spec = spec or {}
+    items = real_garments() if spec.get("fixture") == "real" else sample_garments()
     if "only_categories" in spec:
         items = [g for g in items if g.category in spec["only_categories"]]
     if "exclude_layers" in spec:
@@ -135,6 +183,9 @@ def check(case: dict, gen: Generation | None, error: ApiError | None, wardrobe: 
         results.append((f"{exp['distinct_looks']} distinct looks", len(sets) >= exp["distinct_looks"]))
     if "engine" in exp:
         results.append((f"engine={exp['engine']}", gen.engine == exp["engine"]))
+    if exp.get("honest_gap_or_none"):
+        honest = (not looks) or all(lk.gaps or lk.deviations or lk.impact.purchase_needed for lk in looks)
+        results.append(("honest about what can't be recreated", honest))
     if "engine_note_contains" in exp:
         results.append(("engine labelled", exp["engine_note_contains"] in (gen.engine_note or "")))
     return results

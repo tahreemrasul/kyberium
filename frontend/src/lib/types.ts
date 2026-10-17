@@ -63,6 +63,9 @@ export interface InspirationPiece {
   style_tags: string[];
   visibility: "clear" | "partial" | "obscured";
   importance: "key" | "supporting";
+  material_appearance?: string | null;
+  fit_volume?: string | null;
+  styling_details?: string[];
 }
 
 export interface InspirationAnalysis {
@@ -76,6 +79,14 @@ export interface InspirationAnalysis {
   occasions: Occasion[];
   pieces: InspirationPiece[];
   ambiguities: string[];
+  // Outfit DNA
+  essential_traits?: string[];
+  flexible_traits?: string[];
+  waist_definition?: string | null;
+  volume_balance?: string | null;
+  color_contrast?: string | null;
+  materials?: string[];
+  styling_details?: string[];
 }
 
 export interface Inspiration {
@@ -109,6 +120,9 @@ export interface CandidateMatch {
   /** Relative ranking value — not a probability. */
   score: number;
   reasons: string[];
+  matching_attributes?: string[];
+  differences?: string[];
+  styling_considerations?: string[];
 }
 
 export interface LookItem {
@@ -119,6 +133,7 @@ export interface LookItem {
   explanation: string;
   preserved: string[];
   changed: string[];
+  role?: string | null;
 }
 
 export interface LookGap {
@@ -150,6 +165,37 @@ export interface Look {
   styling_tip?: string | null;
   impact: ImpactSummary;
   warnings: string[];
+  coherence?: string | null;
+  styling_instructions?: string[];
+  preserved_traits?: string[];
+  deviations?: string[];
+  review?: LookReview | null;
+}
+
+/** The critic's verdict as shown to users — a judgment, not an objective score. */
+export interface LookReview {
+  verdict: "approve" | "revise" | "reject";
+  strengths: string[];
+  notes: string[];
+  rounds: number;
+}
+
+export interface TraceStep {
+  step: string;
+  round: number;
+  summary: string;
+  details: string[];
+  latency_ms?: number | null;
+  tokens?: number | null;
+}
+
+export interface StylingTrace {
+  engine: string;
+  rounds: number;
+  steps: TraceStep[];
+  total_latency_ms?: number | null;
+  total_tokens?: number | null;
+  final_decision?: string | null;
 }
 
 export interface KnowledgeHitRef {
@@ -167,10 +213,11 @@ export interface Generation {
   preferences: StylePreferences;
   looks: Look[];
   candidates: Record<string, CandidateMatch[]>;
-  engine: "gemini" | "rules";
+  engine: "agentic" | "gemini" | "rules";
   engine_note?: string | null;
   no_match_reason?: string | null;
   knowledge: KnowledgeHitRef[];
+  trace?: StylingTrace | null;
   created_at: string;
 }
 

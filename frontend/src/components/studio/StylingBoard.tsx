@@ -135,6 +135,19 @@ function InspirationColumn({ generation }: { generation: Generation }) {
             ))}
           </div>
         )}
+        {(a.essential_traits?.length ?? 0) > 0 && (
+          <div>
+            <p className="eyebrow">What makes it work</p>
+            <ul className="mt-1.5 space-y-1 text-xs">
+              {a.essential_traits!.map((t) => (
+                <li key={t} className="flex gap-2">
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-forest" />
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         {(a.proportions || a.layering) && (
           <dl className="space-y-1.5 border-l-2 border-sage pl-3 text-xs text-muted">
             {a.proportions && (
@@ -188,7 +201,75 @@ function ImpactLine({ look }: { look: Look }) {
           {avoided > 0 && ` · ${avoided} potential purchase${avoided === 1 ? "" : "s"} avoided (estimate)`}
         </p>
       </div>
+      {look.review?.verdict === "approve" && (
+        <span
+          className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-full bg-card/80 px-2.5 py-1 text-[11px] text-forest"
+          title={look.review.strengths.join(" · ") || "Approved by the critic"}
+        >
+          <Icon name="check" className="h-3.5 w-3.5" />
+          Critic-reviewed{look.review.rounds > 0 ? ` · revised ${look.review.rounds}×` : ""}
+        </span>
+      )}
     </div>
+  );
+}
+
+function HowToWear({ look }: { look: Look }) {
+  const steps = look.styling_instructions ?? [];
+  if (!steps.length && !look.coherence) return null;
+  return (
+    <section className="rounded-2xl border border-sage/60 bg-card px-5 py-4">
+      <h3 className="eyebrow !text-forest">How to wear it</h3>
+      {steps.length > 0 && (
+        <ol className="mt-2 space-y-1.5 text-sm">
+          {steps.map((s, i) => (
+            <li key={s} className="flex gap-2.5">
+              <span className="font-display text-sage">{i + 1}</span>
+              {s}
+            </li>
+          ))}
+        </ol>
+      )}
+      {look.coherence && <p className="mt-3 text-sm leading-relaxed text-muted">{look.coherence}</p>}
+    </section>
+  );
+}
+
+function DecisionTrace({ generation }: { generation: Generation }) {
+  const trace = generation.trace;
+  if (!trace || trace.steps.length === 0) return null;
+  const secs = trace.total_latency_ms ? (trace.total_latency_ms / 1000).toFixed(0) : null;
+  return (
+    <details className="rounded-2xl border border-line bg-card/60 px-4 py-3 text-sm">
+      <summary className="cursor-pointer text-muted hover:text-ink">
+        How your stylist decided · {trace.final_decision}
+        {secs && <span className="text-xs"> · {secs}s</span>}
+      </summary>
+      <ol className="mt-3 space-y-3">
+        {trace.steps.map((s, i) => (
+          <li key={i} className="border-l-2 border-sage pl-3">
+            <p className="text-xs uppercase tracking-wider text-muted">
+              {s.step === "critic" ? "Critic" : "Stylist"} · pass {s.round}
+              {s.latency_ms ? ` · ${(s.latency_ms / 1000).toFixed(1)}s` : ""}
+            </p>
+            <p className="font-medium">{s.summary}</p>
+            {s.details.length > 0 && (
+              <ul className="mt-1 space-y-0.5 text-xs text-muted">
+                {s.details.map((d, j) => (
+                  <li key={j}>{d}</li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ol>
+      <p className="mt-3 text-[11px] text-muted">
+        Orchestrated with Google ADK: a stylist agent proposes complete outfits, deterministic checks keep them to
+        your real garments, and an independent critic agent reviews them against the inspiration — sending specific
+        fixes back for at most {Math.max(0, trace.rounds - 1)} revision round(s). Critic verdicts are judgments, not
+        scores.
+      </p>
+    </details>
   );
 }
 
@@ -240,6 +321,7 @@ function LookPanel({
   return (
     <div className="animate-rise space-y-6">
       <ImpactLine look={look} />
+      <HowToWear look={look} />
 
       <ul className="grid grid-cols-2 gap-x-4 gap-y-7 xl:grid-cols-3">
         {look.items.map((item) => (
@@ -263,6 +345,7 @@ function LookPanel({
               {item.replaces_description ? `Stands in for · ${item.replaces_description}` : "Completes the look"}
             </p>
             <h3 className="mt-0.5 font-display text-lg leading-snug">{item.garment.name}</h3>
+            {item.role && <p className="text-xs italic text-forest-2">{item.role}</p>}
             <p className="mt-1.5 text-sm leading-relaxed text-ink/85">{item.explanation}</p>
             {(item.preserved.length > 0 || item.changed.length > 0) && (
               <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
@@ -321,8 +404,31 @@ function LookPanel({
             ))}
           </ul>
           {look.styling_tip && <p className="mt-3 text-sm italic text-muted">Tip: {look.styling_tip}</p>}
+          {((look.preserved_traits?.length ?? 0) > 0 || (look.deviations?.length ?? 0) > 0) && (
+            <details className="mt-3 text-sm">
+              <summary className="cursor-pointer text-xs text-muted hover:text-ink">
+                What&apos;s kept and what changes
+              </summary>
+              <dl className="mt-2 space-y-2 text-xs">
+                {(look.preserved_traits?.length ?? 0) > 0 && (
+                  <div>
+                    <dt className="font-medium text-forest">Kept from the inspiration</dt>
+                    <dd className="text-muted">{look.preserved_traits!.join(" · ")}</dd>
+                  </div>
+                )}
+                {(look.deviations?.length ?? 0) > 0 && (
+                  <div>
+                    <dt className="font-medium text-ink">Intentional differences</dt>
+                    <dd className="text-muted">{look.deviations!.join(" · ")}</dd>
+                  </div>
+                )}
+              </dl>
+            </details>
+          )}
         </section>
       )}
+
+      <DecisionTrace generation={generation} />
 
       {look.warnings.length > 0 && (
         <ul className="space-y-1 text-xs text-muted">

@@ -1,22 +1,430 @@
 [
-  {"id": "sp-001", "text": "Balance a boxy or oversized top layer with a defined or straight lower half, or commit to a deliberate wide-leg proportion so the volume reads as intentional.", "tags": ["silhouette", "proportion", "blazer", "oversized", "wide-leg"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-002", "text": "A structured shoulder carries most of a tailored look's formality; a blazer in a different colour keeps the professional read as long as the shoulder and length are similar.", "tags": ["blazer", "tailored", "substitution", "work", "silhouette"], "occasions": ["work", "event"], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-003", "text": "When swapping a colour, keep the value (lightness) relationship between pieces: a light top over dark trousers still reads similarly if the replacement colours keep that contrast.", "tags": ["palette", "colour", "contrast", "substitution"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-004", "text": "Neutral bases (cream, camel, navy, black, grey) let a single accent colour carry a look; replacing the accent changes mood more than replacing a neutral.", "tags": ["palette", "neutral", "accent", "colour"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-005", "text": "A two-piece of a silky top and a fluid midi skirt can stand in for a slip dress: keep the column line by matching or tonally pairing the colours.", "tags": ["dress", "slip", "midi", "skirt", "substitution", "evening", "event"], "occasions": ["event"], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-006", "text": "Layering reads best with length steps: the outer layer slightly longer or deliberately cropped relative to the layer beneath.", "tags": ["layering", "outerwear", "length", "proportion"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-007", "text": "For work settings, swap trainers for leather loafers or clean ankle boots to lift a casual outfit without changing its silhouette.", "tags": ["shoes", "work", "formality", "loafers", "sneakers"], "occasions": ["work"], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-008", "text": "Minimal white leather sneakers can replace flats in smart-casual looks when the rest of the outfit is tailored and the palette stays restrained.", "tags": ["shoes", "sneakers", "smart casual", "substitution"], "occasions": ["everyday", "travel", "work"], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-009", "text": "A cropped or boxy jacket pairs well with high-rise bottoms because it shows the waistline and lengthens the leg line.", "tags": ["cropped", "jacket", "high-rise", "proportion", "denim"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-010", "text": "Stripes act like a neutral with texture; a Breton top can replace a plain tee in a casual look and adds the visual interest a printed piece would.", "tags": ["pattern", "stripe", "breton", "casual", "substitution"], "occasions": ["everyday", "travel"], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-011", "text": "Tonal dressing (several shades of one colour family) makes mismatched pieces look intentional and is a reliable route to a creative remix.", "tags": ["palette", "tonal", "creative", "colour"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-012", "text": "For travel, favour pieces that layer and re-pair: a knit, a jacket and one pair of comfortable smart shoes cover most itineraries.", "tags": ["travel", "capsule", "layering", "versatility"], "occasions": ["travel"], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-013", "text": "A cardigan or knit worn open can take the role of a light outer layer when a jacket is missing, keeping the layered silhouette softer.", "tags": ["layering", "cardigan", "knit", "outerwear", "substitution"], "occasions": ["everyday", "travel", "work"], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-014", "text": "Evening looks depend on sheen and line more than on a specific garment: satin, silk-look or sleek leather pieces can be combined to recreate an event outfit.", "tags": ["event", "evening", "satin", "silk", "substitution"], "occasions": ["event"], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-015", "text": "A structured bag adds polish to a work look; a soft tote reads more relaxed. Swap accordingly when changing the formality of an outfit.", "tags": ["accessory", "bag", "tote", "work", "formality"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-016", "text": "Before buying a missing piece, check whether an owned item covers its role (warmth, structure, colour accent); a gap in role matters more than a gap in exact garment type.", "tags": ["gap", "sustainability", "reuse", "versatility"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-017", "text": "Straight-leg jeans and straight trousers are interchangeable silhouettes; switching between them mostly changes formality, not proportion.", "tags": ["bottom", "jeans", "trousers", "straight", "silhouette", "formality"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-018", "text": "A long coat's role in an outfit is a vertical line plus warmth; a longline blazer or open cardigan can echo the line, a cropped jacket cannot.", "tags": ["coat", "trench", "outerwear", "length", "silhouette", "substitution"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-019", "text": "Earthy accents such as rust or terracotta pair naturally with sage, cream and denim, giving a warmer take on a neutral palette.", "tags": ["palette", "rust", "sage", "accent", "colour", "creative"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"},
-  {"id": "sp-020", "text": "A wrap or belted midi dress can replace a separates outfit when the inspiration's key feature is a defined waist with a fluid skirt.", "tags": ["dress", "wrap", "midi", "waist", "substitution", "silhouette"], "occasions": [], "source_title": "Rewear original styling card", "source_url": null, "license": "Team Kyberium original", "provenance": "original"}
+  {
+    "id": "sp-001",
+    "text": "Balance a boxy or oversized top layer with a defined or straight lower half, or commit to a deliberate wide-leg proportion so the volume reads as intentional.",
+    "tags": [
+      "silhouette",
+      "proportion",
+      "blazer",
+      "oversized",
+      "wide-leg"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-002",
+    "text": "A structured shoulder carries most of a tailored look's formality; a blazer in a different colour keeps the professional read as long as the shoulder and length are similar.",
+    "tags": [
+      "blazer",
+      "tailored",
+      "substitution",
+      "work",
+      "silhouette"
+    ],
+    "occasions": [
+      "work",
+      "event"
+    ],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-003",
+    "text": "When swapping a colour, keep the value (lightness) relationship between pieces: a light top over dark trousers still reads similarly if the replacement colours keep that contrast.",
+    "tags": [
+      "palette",
+      "colour",
+      "contrast",
+      "substitution"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-004",
+    "text": "Neutral bases (cream, camel, navy, black, grey) let a single accent colour carry a look; replacing the accent changes mood more than replacing a neutral.",
+    "tags": [
+      "palette",
+      "neutral",
+      "accent",
+      "colour"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-005",
+    "text": "A two-piece of a silky top and a fluid midi skirt can stand in for a slip dress: keep the column line by matching or tonally pairing the colours.",
+    "tags": [
+      "dress",
+      "slip",
+      "midi",
+      "skirt",
+      "substitution",
+      "evening",
+      "event"
+    ],
+    "occasions": [
+      "event"
+    ],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-006",
+    "text": "Layering reads best with length steps: the outer layer slightly longer or deliberately cropped relative to the layer beneath.",
+    "tags": [
+      "layering",
+      "outerwear",
+      "length",
+      "proportion"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-007",
+    "text": "For work settings, swap trainers for leather loafers or clean ankle boots to lift a casual outfit without changing its silhouette.",
+    "tags": [
+      "shoes",
+      "work",
+      "formality",
+      "loafers",
+      "sneakers"
+    ],
+    "occasions": [
+      "work"
+    ],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-008",
+    "text": "Minimal white leather sneakers can replace flats in smart-casual looks when the rest of the outfit is tailored and the palette stays restrained.",
+    "tags": [
+      "shoes",
+      "sneakers",
+      "smart casual",
+      "substitution"
+    ],
+    "occasions": [
+      "everyday",
+      "travel",
+      "work"
+    ],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-009",
+    "text": "A cropped or boxy jacket pairs well with high-rise bottoms because it shows the waistline and lengthens the leg line.",
+    "tags": [
+      "cropped",
+      "jacket",
+      "high-rise",
+      "proportion",
+      "denim"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-010",
+    "text": "Stripes act like a neutral with texture; a Breton top can replace a plain tee in a casual look and adds the visual interest a printed piece would.",
+    "tags": [
+      "pattern",
+      "stripe",
+      "breton",
+      "casual",
+      "substitution"
+    ],
+    "occasions": [
+      "everyday",
+      "travel"
+    ],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-011",
+    "text": "Tonal dressing (several shades of one colour family) makes mismatched pieces look intentional and is a reliable route to a creative remix.",
+    "tags": [
+      "palette",
+      "tonal",
+      "creative",
+      "colour"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-012",
+    "text": "For travel, favour pieces that layer and re-pair: a knit, a jacket and one pair of comfortable smart shoes cover most itineraries.",
+    "tags": [
+      "travel",
+      "capsule",
+      "layering",
+      "versatility"
+    ],
+    "occasions": [
+      "travel"
+    ],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-013",
+    "text": "A cardigan or knit worn open can take the role of a light outer layer when a jacket is missing, keeping the layered silhouette softer.",
+    "tags": [
+      "layering",
+      "cardigan",
+      "knit",
+      "outerwear",
+      "substitution"
+    ],
+    "occasions": [
+      "everyday",
+      "travel",
+      "work"
+    ],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-014",
+    "text": "Evening looks depend on sheen and line more than on a specific garment: satin, silk-look or sleek leather pieces can be combined to recreate an event outfit.",
+    "tags": [
+      "event",
+      "evening",
+      "satin",
+      "silk",
+      "substitution"
+    ],
+    "occasions": [
+      "event"
+    ],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-015",
+    "text": "A structured bag adds polish to a work look; a soft tote reads more relaxed. Swap accordingly when changing the formality of an outfit.",
+    "tags": [
+      "accessory",
+      "bag",
+      "tote",
+      "work",
+      "formality"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-016",
+    "text": "Before buying a missing piece, check whether an owned item covers its role (warmth, structure, colour accent); a gap in role matters more than a gap in exact garment type.",
+    "tags": [
+      "gap",
+      "sustainability",
+      "reuse",
+      "versatility"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-017",
+    "text": "Straight-leg jeans and straight trousers are interchangeable silhouettes; switching between them mostly changes formality, not proportion.",
+    "tags": [
+      "bottom",
+      "jeans",
+      "trousers",
+      "straight",
+      "silhouette",
+      "formality"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-018",
+    "text": "A long coat's role in an outfit is a vertical line plus warmth; a longline blazer or open cardigan can echo the line, a cropped jacket cannot.",
+    "tags": [
+      "coat",
+      "trench",
+      "outerwear",
+      "length",
+      "silhouette",
+      "substitution"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-019",
+    "text": "Earthy accents such as rust or terracotta pair naturally with sage, cream and denim, giving a warmer take on a neutral palette.",
+    "tags": [
+      "palette",
+      "rust",
+      "sage",
+      "accent",
+      "colour",
+      "creative"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-020",
+    "text": "A wrap or belted midi dress can replace a separates outfit when the inspiration's key feature is a defined waist with a fluid skirt.",
+    "tags": [
+      "dress",
+      "wrap",
+      "midi",
+      "waist",
+      "substitution",
+      "silhouette"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-021",
+    "text": "When a fluid, lustrous fabric replaces a rigid casual one (satin for denim), keep the overall mood casual with matte, relaxed partners — a knit or tee and flat shoes — so the piece reads intentional rather than dressed up.",
+    "tags": [
+      "texture",
+      "material",
+      "satin",
+      "denim",
+      "formality",
+      "substitution",
+      "casual"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-022",
+    "text": "A loose knit worn over a skirt hides the waist; a front-tuck or half-tuck restores waist definition without the bulk of a full tuck.",
+    "tags": [
+      "tuck",
+      "waist",
+      "knit",
+      "sweater",
+      "proportion",
+      "volume"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-023",
+    "text": "Defined waist plus a long lower line is a proportion, not a garment: any combination that marks the natural waist and continues long and unbroken below keeps it — high-rise wide-leg trousers can do what a midi skirt does.",
+    "tags": [
+      "waist",
+      "proportion",
+      "silhouette",
+      "midi",
+      "wide-leg",
+      "substitution",
+      "length"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-024",
+    "text": "Swapping a light top for a dark one flips the outfit's contrast; recover it with a light shoe, bag or layer, or commit to a deliberate tonal dark look.",
+    "tags": [
+      "contrast",
+      "palette",
+      "colour",
+      "light",
+      "dark",
+      "substitution"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  },
+  {
+    "id": "sp-025",
+    "text": "An outer layer is only worth adding if it serves the silhouette: a cropped jacket can sharpen a defined waist, a long or boxy one usually hides it.",
+    "tags": [
+      "layering",
+      "outerwear",
+      "jacket",
+      "waist",
+      "proportion",
+      "cropped"
+    ],
+    "occasions": [],
+    "source_title": "Rewear original styling card",
+    "source_url": null,
+    "license": "Team Kyberium original",
+    "provenance": "original"
+  }
 ]

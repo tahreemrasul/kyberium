@@ -22,3 +22,6 @@ next-env.d.ts
 # Test artifacts
 frontend/test-results/
 frontend/playwright-report/
+
+# Team garment photos used for local evals (may contain people; keep out of git)
+/images/

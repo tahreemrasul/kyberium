@@ -3,9 +3,10 @@ name = "rewear-api"
 version = "0.1.0"
 description = "Rewear API — reuse-first AI styling on Gemini"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.14"
 dependencies = [
-    "fastapi>=0.143.3",
+    "fastapi>=0.133",
+    "google-adk>=2.12",
     "google-cloud-firestore>=2.34.1",
     "google-cloud-storage>=3.17.1",
     "google-genai>=2.31.0",
@@ -39,3 +40,5 @@ ignore = ["B008"]
 [tool.ruff.lint.per-file-ignores]
 "app/demo/illustrations.py" = ["E501"]
 "evals/run_evals.py" = ["E501"]
+"app/stylist/workflow.py" = ["E501"]
+"app/stylist/prompts.py" = ["E501"]

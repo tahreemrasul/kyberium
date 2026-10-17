@@ -312,15 +312,31 @@ export function StudioView() {
   );
 }
 
-const STEPS = ["Analysing your inspiration", "Looking in your closet", "Styling your options"];
+const STEPS = [
+  "Analysing your inspiration's DNA",
+  "Stylist composing complete outfits from your closet",
+  "Critic reviewing each look against the inspiration",
+  "Refining anything the critic flagged",
+];
+// Typical timings of the stylist -> critic -> refinement workflow; the board's
+// "How your stylist decided" panel shows what actually happened.
+const STEP_AFTER_MS = [0, 0, 13000, 24000];
 
 function Progress({ phase, analysis }: { phase: Phase; analysis: InspirationAnalysis | null }) {
-  const current = phase === "analyzing" ? 0 : 1;
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (phase !== "composing") return;
+    const started = Date.now();
+    const id = window.setInterval(() => setElapsed(Date.now() - started), 1000);
+    return () => window.clearInterval(id);
+  }, [phase]);
+  const current =
+    phase === "analyzing" ? 0 : Math.max(1, STEP_AFTER_MS.filter((t, i) => i > 0 && phase === "composing" && elapsed >= t).length);
   return (
     <div className="space-y-4 rounded-2xl border border-line bg-card px-5 py-4" aria-live="polite">
       <ol className="space-y-2.5">
         {STEPS.map((label, i) => {
-          const state = i < current ? "done" : i === current || (current === 1 && i === 2) ? "active" : "todo";
+          const state = i < current ? "done" : i === current ? "active" : "todo";
           return (
             <li key={label} className={`flex items-center gap-3 text-sm ${state === "todo" ? "text-muted" : "text-ink"}`}>
               {state === "done" ? (
@@ -335,6 +351,9 @@ function Progress({ phase, analysis }: { phase: Phase; analysis: InspirationAnal
           );
         })}
       </ol>
+      {phase === "composing" && elapsed > 8000 && (
+        <p className="text-xs text-muted">Quality takes a moment — weak looks are sent back, not shown.</p>
+      )}
       {phase === "composing" && analysis && analysis.pieces.length > 0 && (
         <div className="animate-rise border-t border-line pt-3">
           <p className="text-xs text-muted">We spotted</p>
