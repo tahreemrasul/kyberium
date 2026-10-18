@@ -108,6 +108,9 @@ class GarmentAnalysis(ApiModel):
 
     upload_id: str
     image_url: str
+    display_url: str | None = Field(
+        default=None, description="Garment cut out / cropped and placed at a standard scale on the studio background"
+    )
     draft: GarmentDraft | None
     engine: Literal["gemini", "none"]
     cached: bool = False
@@ -135,7 +138,7 @@ class GarmentUpdate(ApiModel):
 class Garment(GarmentAttributes):
     id: str
     image_url: str
-    image_kind: Literal["photo", "illustration"] = "photo"
+    image_kind: Literal["photo", "cutout", "illustration"] = "photo"
     source: Literal["upload", "sample"] = "upload"
     verified_by_user: bool = True
     created_at: datetime

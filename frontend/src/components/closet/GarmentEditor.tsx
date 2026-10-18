@@ -332,11 +332,20 @@ export function AddGarmentDialog({ open, onClose }: { open: boolean; onClose: ()
       {phase !== "pick" && (
         <div className="grid gap-6 sm:grid-cols-[200px_1fr]">
           <div className="space-y-3">
-            {preview && (
-              <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-well">
-                {/* eslint-disable-next-line @next/next/no-img-element -- local preview */}
-                <img src={preview} alt="Your garment" className="h-full w-full object-cover" />
-              </div>
+            {analysis?.display_url ? (
+              <GarmentImage
+                src={analysis.display_url}
+                alt="Your garment, standardised for the closet"
+                kind="cutout"
+                className="aspect-[4/5] rounded-2xl"
+              />
+            ) : (
+              preview && (
+                <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-well">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- local preview */}
+                  <img src={preview} alt="Your garment" className="h-full w-full object-cover" />
+                </div>
+              )
             )}
             {analysis?.engine === "gemini" && (
               <p className="flex items-center gap-1.5 text-xs text-muted">

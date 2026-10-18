@@ -34,6 +34,8 @@ export interface GarmentDraft extends GarmentAttributes {
 export interface GarmentAnalysis {
   upload_id: string;
   image_url: string;
+  /** Garment cut out/cropped and placed at a standard scale on the studio background. */
+  display_url?: string | null;
   draft: GarmentDraft | null;
   engine: "gemini" | "none";
   cached: boolean;
@@ -43,7 +45,7 @@ export interface GarmentAnalysis {
 export interface Garment extends GarmentAttributes {
   id: string;
   image_url: string;
-  image_kind: "photo" | "illustration";
+  image_kind: "photo" | "cutout" | "illustration";
   source: "upload" | "sample";
   verified_by_user: boolean;
   created_at: string;
