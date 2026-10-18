@@ -31,6 +31,7 @@ from google.genai import types
 
 from app.config import Settings
 from app.knowledge import FashionKnowledgeHit
+from app.pipeline.roles import rank_role_candidates
 from app.pipeline.validation import build_looks
 from app.schemas import (
     CandidateMatch,
@@ -61,6 +62,7 @@ class AgenticResult:
     looks: list[Look]
     no_match_reason: str | None
     trace: StylingTrace
+    timings: dict[str, int] = field(default_factory=dict)
 
 
 def configure_vertex(settings: Settings) -> None:
@@ -113,6 +115,11 @@ class StylingRun:
     steps: list[TraceStep] = field(default_factory=list)
     round: int = 0
     _t0: dict[str, float] = field(default_factory=dict)
+    timings: dict[str, int] = field(default_factory=dict)
+
+    def _add(self, key: str, value: int | None) -> None:
+        if value:
+            self.timings[key] = self.timings.get(key, 0) + int(value)
 
     # ------------------------------------------------------------------ prompts
 
@@ -139,6 +146,10 @@ class StylingRun:
                 ]
                 for slot, cs in self.candidates.items()
             },
+            "multi_role_candidates": [
+                {**garment_brief(self.wardrobe[rc.garment_id]), **rc.model_dump(exclude={"garment_id"})}
+                for rc in rank_role_candidates(self.analysis, list(self.wardrobe.values()), self.prefs)
+            ],
             "other_owned_garments": [garment_brief(g) for gid, g in self.wardrobe.items() if gid not in shortlisted][
                 :40
             ],
@@ -202,6 +213,16 @@ class StylingRun:
             usage = getattr(llm_response, "usage_metadata", None)
             tokens = getattr(usage, "total_token_count", None) if usage else None
             latency = int((time.perf_counter() - started) * 1000) if started else None
+            self._add(f"{name}_ms", latency)
+            self._add(f"{name}_tokens", tokens)
+            self._add(f"{name}_calls", 1)
+            if self.round >= (1 if name == "stylist" else 2):  # passes after the first are revisions
+                self._add("revision_ms", latency)
+            details = getattr(usage, "prompt_tokens_details", None) or []
+            self._add(
+                f"{name}_image_tokens",
+                sum(d.token_count or 0 for d in details if "IMAGE" in str(getattr(d, "modality", "")).upper()),
+            )
             self.steps.append(
                 TraceStep(
                     step=f"{name}_model_call",
@@ -217,7 +238,8 @@ class StylingRun:
 
     async def _attach_images(self, callback_context, llm_request):
         """Give the critic the actual garment and inspiration images."""
-        self._t0["critic"] = time.perf_counter()
+        prep_started = time.perf_counter()
+        self._t0["critic"] = prep_started
         if not (self.settings.critic_uses_images and self.image_loader):
             return None
         parts: list[types.Part] = []
@@ -239,6 +261,9 @@ class StylingRun:
                     ]
         if parts:
             llm_request.contents.append(types.Content(role="user", parts=parts))
+        self._add("critic_image_prep_ms", int((time.perf_counter() - prep_started) * 1000))
+        self._add("critic_images", sum(1 for p in parts if p.inline_data))
+        self._t0["critic"] = time.perf_counter()  # critic_ms is model time only
         return None
 
     # ------------------------------------------------------------------ nodes
@@ -451,8 +476,10 @@ class StylingRun:
                 else "No look passed the critic"
             ),
         )
-        log.info("styling trace %s", trace.model_dump_json())
-        return AgenticResult(looks=accepted[:MAX_LOOKS], no_match_reason=no_match, trace=trace)
+        self.timings["workflow_ms"] = trace.total_latency_ms or 0
+        self.timings["passes"] = self.round
+        log.info("styling trace %s timings %s", trace.model_dump_json(), json.dumps(self.timings))
+        return AgenticResult(looks=accepted[:MAX_LOOKS], no_match_reason=no_match, trace=trace, timings=self.timings)
 
     async def run(self) -> AgenticResult:
         configure_vertex(self.settings)

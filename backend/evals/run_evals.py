@@ -32,6 +32,7 @@ from app.demo import SAMPLE_INSPIRATION_INDEX, sample_garments
 from app.errors import ApiError
 from app.knowledge import get_retriever
 from app.pipeline.orchestrator import run_pipeline
+from app.pipeline.validation import covered_slots
 from app.schemas import Garment, Generation, InspirationAnalysis, StylePreferences
 from app.stylist.images import make_image_loader
 
@@ -128,7 +129,7 @@ def check(case: dict, gen: Generation | None, error: ApiError | None, wardrobe: 
         ("all garment ids owned", all(g in wardrobe for g in owned_ids)),
         (
             "every slot covered or listed as gap",
-            all({i.replaces_slot_id for i in lk.items} | {g.slot_id for g in lk.gaps} >= slots for lk in looks),
+            all(covered_slots(lk.items) | {g.slot_id for g in lk.gaps} >= slots for lk in looks),
         ),
     ]
 
@@ -148,7 +149,7 @@ def check(case: dict, gen: Generation | None, error: ApiError | None, wardrobe: 
             (f"{slot} in {allowed}", sm.get(slot) in allowed) for slot, allowed in exp["closest_slot_in"].items()
         ]
     if "covered_slots" in exp and closest:
-        results.append(("key slots covered", set(exp["covered_slots"]) <= {i.replaces_slot_id for i in closest.items}))
+        results.append(("key slots covered", set(exp["covered_slots"]) <= covered_slots(closest.items)))
     for slot, cats in exp.get("slot_covered_by_categories", {}).items():
         ok = any({i.garment.category for i in lk.items if i.replaces_slot_id == slot} >= set(cats) for lk in looks)
         results.append((f"{slot} covered by {cats}", ok))

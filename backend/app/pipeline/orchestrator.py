@@ -10,6 +10,7 @@ Composition engines, in order of preference:
 """
 
 import logging
+import time
 import uuid
 from datetime import UTC, datetime
 
@@ -82,7 +83,10 @@ async def run_pipeline(
             created_at=now,
         )
 
+    t_start = time.perf_counter()
     candidates = rank_candidates(analysis, list(wardrobe.values()), prefs)
+    timings: dict[str, int] = {"retrieval_ms": int((time.perf_counter() - t_start) * 1000)}
+    t_k = time.perf_counter()
     hits = await safe_search(
         retriever,
         build_query(analysis, prefs, candidates),
@@ -90,6 +94,7 @@ async def run_pipeline(
         timeout_s=settings.fashion_knowledge_timeout_s,
     )
 
+    timings["knowledge_ms"] = int((time.perf_counter() - t_k) * 1000)
     engine = "rules"
     note: str | None = None
     looks = []
@@ -111,12 +116,15 @@ async def run_pipeline(
             # An empty result is a legitimate, honest outcome (the critic rejected everything):
             # it is returned as such, never replaced by unreviewed looks.
             engine, looks, no_match, trace = "agentic", result_a.looks, result_a.no_match_reason, result_a.trace
+            timings.update(result_a.timings)
         except AgenticError as exc:
             log.warning("agentic stylist failed, using single-pass composer: %s", exc)
             note = AGENTIC_FALLBACK_NOTE
     if ai is not None and engine != "agentic":
         try:
+            t_c = time.perf_counter()
             result = await compose_with_gemini(ai, analysis, prefs, candidates, wardrobe, hits)
+            timings["composer_ms"] = int((time.perf_counter() - t_c) * 1000)
             looks = build_looks(result.looks, wardrobe, analysis, prefs)
             no_match = result.no_match_reason
             engine = "gemini"
@@ -154,6 +162,7 @@ async def run_pipeline(
             KnowledgeHitRef(id=h.id, text=h.text, source_title=h.source_title, source_url=h.source_url) for h in hits
         ],
         trace=trace,
+        timings={**timings, "total_ms": int((time.perf_counter() - t_start) * 1000)},
         created_at=now,
     )
 

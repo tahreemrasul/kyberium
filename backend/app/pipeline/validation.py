@@ -46,9 +46,29 @@ def is_essential(piece: InspirationPiece) -> bool:
     return piece.importance == "key" and piece.category not in ("accessory",)
 
 
+def covered_slots(items: list[LookItem]) -> set[str]:
+    out: set[str] = set()
+    for i in items:
+        if i.replaces_slot_id:
+            out.add(i.replaces_slot_id)
+        out.update(i.covers_slot_ids)
+    return out
+
+
+def _may_cover(g: Garment, piece: InspirationPiece) -> bool:
+    """Which extra roles a garment can plausibly take on besides its main one."""
+    if g.category == piece.category:
+        return True
+    if g.category == "dress":
+        return piece.category in ("top", "bottom")
+    if g.category in ("top", "outerwear"):
+        return piece.category in ("top", "outerwear")
+    return False
+
+
 def compute_impact(items: list[LookItem], gaps: list[LookGap], analysis: InspirationAnalysis) -> ImpactSummary:
     total = len(analysis.pieces)
-    covered = len({i.replaces_slot_id for i in items if i.replaces_slot_id})
+    covered = len(covered_slots(items))
     essential = sum(1 for g in gaps if g.essential)
     owned = len(items)
     if not gaps:
@@ -108,13 +128,24 @@ def build_look(
                 continue
             single_used.add(g.category)
         slot = ci.replaces_slot_id if ci.replaces_slot_id in slots else None
+        # One garment may fill several roles (a shirt-dress for top + skirt). Only one-piece garments
+        # may also cover a bottom, so a top can never "cover" the trousers.
+        extra = [
+            s_id
+            for s_id in dict.fromkeys(ci.covers_slot_ids)
+            if s_id in slots and s_id != slot and _may_cover(g, slots[s_id])
+        ]
+        if slot is None and extra:
+            slot, extra = extra[0], extra[1:]
         used.add(g.id)
+        descs = [slots[x].description for x in ([slot] if slot else []) + extra]
         items.append(
             LookItem(
                 garment_id=g.id,
                 garment=g,
                 replaces_slot_id=slot,
-                replaces_description=slots[slot].description if slot else None,
+                covers_slot_ids=extra,
+                replaces_description=" + ".join(descs) if descs else None,
                 explanation=ci.explanation.strip() or f"{g.name} completes the look.",
                 preserved=[s for s in ci.preserved if s.strip()][:5],
                 changed=[s for s in ci.changed if s.strip()][:5],
@@ -156,7 +187,7 @@ def build_look(
         return None
     items.sort(key=lambda it: _DISPLAY_ORDER.get(it.garment.category, 9))
 
-    covered = {i.replaces_slot_id for i in items if i.replaces_slot_id}
+    covered = covered_slots(items)
     gaps: list[LookGap] = []
     model_gaps = {cg.slot_id: cg for cg in composed.gaps if cg.slot_id in slots}
     for slot_id, piece in slots.items():

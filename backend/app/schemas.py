@@ -254,10 +254,25 @@ class CandidateMatch(ApiModel):
     styling_considerations: list[str] = Field(default_factory=list)
 
 
+class RoleCandidate(ApiModel):
+    """One owned garment that can fill SEVERAL inspiration roles at once (e.g. a dress for top + skirt)."""
+
+    garment_id: str
+    covers_slot_ids: list[str]
+    score: float = Field(description="Relative ranking value in [0,1]. NOT a probability.")
+    matching_attributes: list[str] = Field(default_factory=list)
+    differences: list[str] = Field(default_factory=list)
+    styling_considerations: list[str] = Field(default_factory=list)
+
+
 class ComposedItem(ApiModel):
     garment_id: str
     replaces_slot_id: str | None = Field(
         description="Inspiration slot this garment stands in for; null if an added piece"
+    )
+    covers_slot_ids: list[str] = Field(
+        default_factory=list,
+        description="Other inspiration slots this ONE garment also fulfils (e.g. a shirt-dress: top-1 and bottom-1)",
     )
     role: str | None = Field(default=None, description="The garment's job in this outfit, e.g. 'crisp base layer'")
     explanation: str
@@ -369,6 +384,7 @@ class LookItem(ApiModel):
     preserved: list[str]
     changed: list[str]
     role: str | None = None
+    covers_slot_ids: list[str] = Field(default_factory=list)
 
 
 class LookGap(ApiModel):
@@ -431,6 +447,9 @@ class Generation(ApiModel):
     no_match_reason: str | None = None
     knowledge: list[KnowledgeHitRef] = Field(default_factory=list)
     trace: StylingTrace | None = None
+    timings: dict[str, int] = Field(
+        default_factory=dict, description="Per-stage latency (ms) and token/image counts, for cost analysis"
+    )
     created_at: datetime
 
 

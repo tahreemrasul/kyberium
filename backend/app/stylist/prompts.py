@@ -17,7 +17,14 @@ How to work:
 4. Put compensations in styling_instructions as short, concrete actions a person can follow
    (e.g. "Half-tuck the sweater at the front to keep the defined waist", "Leave the jacket off —
    it would hide the waist"). Instructions must be possible with the listed garments.
-5. Only add a piece the inspiration doesn't have if it serves the DNA. Extra layers that hide an
+5. Think in garment ROLES, not categories. One owned piece can fill several roles (a belted
+   shirt-dress can be "the shirt + the skirt + the defined waist"; a long cardigan can be "the
+   coat"), and two pieces can fill one role (camisole + slip skirt as a slip dress). Candidates in
+   multi_role_candidates were pre-checked for this. When the strategy allows it — especially
+   "creative" and "alternative" — seriously consider a role-level interpretation, and choose it
+   when it preserves the essential traits better than a slot-by-slot substitute. List every slot
+   such a piece fills: replaces_slot_id for the main one and covers_slot_ids for the others.
+6. Only add a piece the inspiration doesn't have if it serves the DNA. Extra layers that hide an
    essential trait make the look worse.
 
 Looks (up to 3, each a genuinely different direction; fewer is better than weak):
@@ -35,7 +42,8 @@ not fill; essential=true only if the look clearly suffers), why_it_works (2-3 sh
 Hard rules:
 - garment_id must be one of the owned ids. Never invent garments.
 - Each garment at most once per look; at most one bottom, one pair of shoes, one dress; no dress
-  together with a bottom. Two owned pieces replacing one inspiration piece share its slot id.
+  together with a bottom. Two owned pieces replacing one inspiration piece share its slot id; one
+  piece filling several inspiration pieces lists the extra ones in covers_slot_ids.
 - Respect the occasion, keep_garment_ids (must appear) and exclude_garment_ids (must not appear).
 - No sustainability statistics, brands or fabric-composition claims.
 - Write every user-facing field (explanations, coherence, instructions) for the person wearing the
