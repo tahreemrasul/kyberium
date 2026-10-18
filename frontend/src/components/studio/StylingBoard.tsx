@@ -191,10 +191,11 @@ function ImpactLine({ look }: { look: Look }) {
   const avoided = look.impact.potential_purchases_avoided;
   return (
     <div
-      className={`flex items-start gap-3 rounded-2xl px-4 py-3 text-sm ${ok ? "bg-sage-soft text-forest" : "bg-clay-soft/70 text-ink"}`}
+      className={`flex items-start gap-3 rounded-2xl px-4 py-3.5 text-sm ${ok ? "bg-forest text-card" : "bg-clay-soft/70 text-ink"}`}
     >
-      <Icon name={ok ? "leaf" : "alert"} className={`mt-0.5 h-5 w-5 shrink-0 ${ok ? "text-forest" : "text-clay"}`} />
+      <Icon name={ok ? "leaf" : "alert"} className={`mt-0.5 h-6 w-6 shrink-0 ${ok ? "text-sage" : "text-clay"}`} />
       <div>
+        {ok && <p className="text-[10px] uppercase tracking-[0.16em] text-sage">Shopped from your closet</p>}
         <p className="font-medium">{look.impact.headline}</p>
         <p className="mt-0.5 text-xs opacity-80">
           {look.impact.owned_count} owned piece{look.impact.owned_count === 1 ? "" : "s"} reused
@@ -441,16 +442,24 @@ function LookPanel({
       {generation.knowledge.length > 0 && (
         <details className="text-xs text-muted">
           <summary className="cursor-pointer hover:text-ink">Styling principles considered</summary>
-          <ul className="mt-2 space-y-1">
+          <ul className="mt-2 space-y-2">
             {generation.knowledge.map((k) => (
               <li key={k.id}>
-                {k.text}{" "}
-                {k.source_url ? (
-                  <a href={k.source_url} target="_blank" rel="noreferrer" className="underline">
-                    {k.source_title ?? "source"}
-                  </a>
-                ) : (
-                  k.source_title && <span>— {k.source_title}</span>
+                <span className="mr-1.5 rounded-full bg-well px-2 py-0.5 text-[10px] uppercase tracking-wider text-forest">
+                  {k.collection ?? "Rewear Styling Principles"}
+                </span>
+                {k.text}
+                {k.source_title && (
+                  <span className="block text-[11px]">
+                    Source:{" "}
+                    {k.source_url ? (
+                      <a href={k.source_url} target="_blank" rel="noreferrer" className="underline">
+                        {k.source_title}
+                      </a>
+                    ) : (
+                      k.source_title
+                    )}
+                  </span>
                 )}
               </li>
             ))}

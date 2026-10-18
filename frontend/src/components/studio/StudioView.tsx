@@ -233,6 +233,11 @@ export function StudioView() {
           onChange={(shopping) => setPrefs({ shopping })}
           options={(Object.keys(SHOPPING_LABEL) as Shopping[]).map((s) => ({ value: s, ...SHOPPING_LABEL[s] }))}
         />
+        <p className="-mt-4 flex items-start gap-2 rounded-xl bg-sage-soft/70 px-3 py-2 text-xs text-forest">
+          <Icon name="leaf" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          Reuse first, always: every look is built from your closet. Shopping ideas only appear for genuine gaps — and
+          only if you allow them, pre-loved first.
+        </p>
         <details className="group rounded-2xl border border-line bg-card/60 px-4 py-3">
           <summary className="cursor-pointer text-sm text-muted group-open:text-ink">More preferences</summary>
           <label className="mt-3 block space-y-1.5">

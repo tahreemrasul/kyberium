@@ -95,6 +95,12 @@ export function ClosetView() {
           <p className="eyebrow">Your wardrobe, digitised</p>
           <h1 className="mt-2 font-display text-4xl sm:text-5xl">My Closet</h1>
           <p className="mt-2 max-w-xl text-sm text-muted">Every outfit Rewear suggests is built only from what&apos;s here.</p>
+          {items.length > 0 && (
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-sage-soft px-3 py-1 text-xs text-forest">
+              <Icon name="leaf" className="h-3.5 w-3.5" />
+              {items.length} piece{items.length === 1 ? "" : "s"} ready to restyle — shop your closet before the store
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           {hasSamples ? (

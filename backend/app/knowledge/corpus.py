@@ -167,6 +167,7 @@ class CorpusFashionKnowledgeRetriever:
                     text=render(r),
                     score=round(s / best, 3),
                     tags=[r.get("topic", ""), r.get("subtopic", ""), *r.get("relevant_attributes", [])][:8],
+                    collection="Fashion Encyclopedia",
                     source_title=src.get("title"),
                     source_url=src.get("url"),
                     license=", ".join(rights),

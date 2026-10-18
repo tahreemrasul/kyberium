@@ -431,6 +431,7 @@ class Look(ApiModel):
 class KnowledgeHitRef(ApiModel):
     id: str
     text: str
+    collection: str | None = None
     source_title: str | None = None
     source_url: str | None = None
 

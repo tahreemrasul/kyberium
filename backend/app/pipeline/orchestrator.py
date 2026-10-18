@@ -159,7 +159,10 @@ async def run_pipeline(
         engine_note=" ".join(n for n in (extra_note, note) if n) or None,
         no_match_reason=no_match if not looks else None,
         knowledge=[
-            KnowledgeHitRef(id=h.id, text=h.text, source_title=h.source_title, source_url=h.source_url) for h in hits
+            KnowledgeHitRef(
+                id=h.id, text=h.text, collection=h.collection, source_title=h.source_title, source_url=h.source_url
+            )
+            for h in hits
         ],
         trace=trace,
         timings={**timings, "total_ms": int((time.perf_counter() - t_start) * 1000)},

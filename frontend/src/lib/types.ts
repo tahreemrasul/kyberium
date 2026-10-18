@@ -203,6 +203,8 @@ export interface StylingTrace {
 export interface KnowledgeHitRef {
   id: string;
   text: string;
+  /** "Rewear Styling Principles" (internal) or "Fashion Encyclopedia" (research-backed). */
+  collection?: string | null;
   source_title?: string | null;
   source_url?: string | null;
 }

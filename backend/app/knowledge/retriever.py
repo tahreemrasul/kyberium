@@ -44,6 +44,7 @@ class FashionKnowledgeHit(BaseModel):
     text: str
     score: float | None = None  # ranking value, not a probability of correctness
     tags: list[str] = Field(default_factory=list)
+    collection: str | None = None  # "Rewear Styling Principles" | "Fashion Encyclopedia" | future index name
     source_title: str | None = None
     source_url: str | None = None
     license: str | None = None
@@ -117,6 +118,7 @@ class LocalFashionKnowledgeRetriever:
                 text=r["text"],
                 score=round(s / best, 3),
                 tags=r.get("tags", []),
+                collection=r.get("collection") or "Rewear Styling Principles",
                 source_title=r.get("source_title"),
                 source_url=r.get("source_url"),
                 license=r.get("license"),
