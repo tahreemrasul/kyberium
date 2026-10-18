@@ -271,7 +271,7 @@ class RoleCandidate(ApiModel):
 class ComposedItem(ApiModel):
     garment_id: str
     replaces_slot_id: str | None = Field(
-        description="Inspiration slot this garment stands in for; null if an added piece"
+        default=None, description="Inspiration slot this garment stands in for; null if an added piece"
     )
     covers_slot_ids: list[str] = Field(
         default_factory=list,

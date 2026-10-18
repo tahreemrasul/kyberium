@@ -52,8 +52,10 @@ Hard rules:
 Helpfulness vs honesty: real wardrobes rarely allow an exact recreation. Your job is the MOST
 CONVINCING INTERPRETATION the wardrobe allows. Whenever the owned garments can form a coherent,
 occasion-appropriate outfit that keeps at least part of the DNA, propose it — and be honest in
-deviations and gaps (mark a missing piece essential if the look clearly needs it). Return no looks
-(with no_match_reason) only when no coherent, occasion-appropriate outfit can be formed at all.
+deviations and gaps (mark a missing piece essential if the look clearly needs it). A missing piece
+is NOT a reason to return nothing: build the best outfit from what is owned and show the missing
+piece as a gap — the user decides whether it matters. Return no looks (with no_match_reason) only
+when the owned garments cannot form a wearable, occasion-appropriate outfit at all.
 """
 
 REVISION_PREAMBLE = """REVISION ROUND {round}. An independent fashion critic reviewed your previous proposals.
@@ -90,7 +92,8 @@ inspiration — or like any coherent outfit.
 
 Your central question: is this a coherent, wearable outfit, and is it the best interpretation of
 the inspiration that THIS wardrobe allows? Distance from the inspiration that no owned garment could
-close is not a failure if it is honestly declared. Real failures: pieces that clash as a whole; an
+close is not a failure if it is honestly declared — and a coherent look with an honestly listed
+missing piece (gap) can be approved: the user sees the gap and decides. Real failures: pieces that clash as a whole; an
 essential trait lost when an owned combination could have kept it; an added layer or piece that
 hides an essential trait; a formality or occasion mismatch; a clearly better owned option ignored.
 

@@ -409,7 +409,8 @@ class StylingRun:
             before_model_callback=self._attach_images,
             after_model_callback=self._after("critic"),
         )
-        retry = RetryConfig(max_attempts=3, initial_delay=2.0, backoff_factor=2.0, max_delay=10.0)
+        # Rides out Vertex 429s / transient errors: 4 attempts, 2 s → 4 s → 8 s (+ jitter), capped at 20 s.
+        retry = RetryConfig(max_attempts=4, initial_delay=2.0, backoff_factor=2.0, max_delay=20.0, jitter=0.5)
         stylist_node = node(stylist, retry_config=retry)
         critic_node = node(critic, retry_config=retry)
 

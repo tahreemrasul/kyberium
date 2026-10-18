@@ -154,6 +154,15 @@ async def test_loop_is_bounded(wardrobe):
     assert len([r for r in llm.requests if r[0] == "stylist"]) == 3
 
 
+async def test_item_without_replaces_slot_is_accepted(wardrobe):
+    """Gemini sometimes omits nullable fields for added pieces; that must not fail the whole proposal."""
+    added = {"garment_id": "s_tan_tote", "role": "finishing touch", "explanation": "adds polish"}
+    proposal = {"looks": [{**CLASSIC, "items": CLASSIC["items"] + [added]}]}
+    llm = ScriptedLlm(stylist=[proposal], critic=[{"evaluations": [verdict(0, "approve")], "summary": "ok"}])
+    result = await make_run(wardrobe, llm).run()
+    assert "s_tan_tote" in [i.garment_id for i in result.looks[0].items]
+
+
 async def test_critic_can_be_disabled(wardrobe):
     llm = ScriptedLlm(stylist=[{"looks": [CLASSIC, SAGE]}], critic=[])
     result = await make_run(wardrobe, llm, critic_enabled=False).run()
