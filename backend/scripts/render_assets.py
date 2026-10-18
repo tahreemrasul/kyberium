@@ -36,9 +36,17 @@ def main() -> None:
     pdir.mkdir(exist_ok=True)
     for g in SAMPLE_GARMENTS:
         subprocess.run(
-            [CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars", f"--screenshot={pdir / (g['id'] + '.png')}",
-             "--window-size=400,500", f"file://{gdir / (g['id'] + '.svg')}"],
-            check=True, capture_output=True,
+            [
+                CHROME,
+                "--headless=new",
+                "--disable-gpu",
+                "--hide-scrollbars",
+                f"--screenshot={pdir / (g['id'] + '.png')}",
+                "--window-size=400,500",
+                f"file://{gdir / (g['id'] + '.svg')}",
+            ],
+            check=True,
+            capture_output=True,
         )
     print(f"wrote {len(SAMPLE_GARMENTS)} garment pngs")
 
