@@ -1,0 +1,114 @@
+[
+  {
+    "id": "exact-camel-work",
+    "description": "Exact garment matches: every key piece of the camel work look is owned.",
+    "inspiration": "insp_camel_work",
+    "preferences": {"occasion": "work", "fidelity": "close"},
+    "expect": {
+      "min_looks": 1,
+      "closest_slots": {"outerwear-1": "s_camel_blazer", "top-1": "s_white_tee", "bottom-1": "s_black_trousers", "shoes-1": "s_brown_loafers"},
+      "no_purchase": true,
+      "max_gaps": 0
+    }
+  },
+  {
+    "id": "same-silhouette-different-colour",
+    "description": "Camel blazer removed: a blazer with the same structure in another colour should replace it.",
+    "inspiration": "insp_camel_work",
+    "wardrobe": {"exclude": ["s_camel_blazer"]},
+    "preferences": {"occasion": "work", "fidelity": "aesthetic"},
+    "expect": {"closest_slot_in": {"outerwear-1": ["s_sage_blazer", "s_black_blazer"]}, "no_purchase": true}
+  },
+  {
+    "id": "aesthetic-substitute-weekend",
+    "description": "No olive overshirt owned: another casual outer layer takes its role.",
+    "inspiration": "insp_weekend_layers",
+    "preferences": {"occasion": "everyday", "fidelity": "aesthetic"},
+    "expect": {"covered_slots": ["outerwear-1", "top-1", "bottom-1", "shoes-1"], "no_purchase": true, "distinct_looks": 2}
+  },
+  {
+    "id": "category-substitute-dress",
+    "description": "Matching aesthetic with different categories: slip dress recreated by a top + skirt two-piece.",
+    "inspiration": "insp_emerald_evening",
+    "wardrobe": {"exclude": ["s_wrap_dress"]},
+    "preferences": {"occasion": "event", "fidelity": "creative"},
+    "expect": {"slot_covered_by_categories": {"dress-1": ["top", "bottom"]}, "optional_gaps": ["accessory-1"]}
+  },
+  {
+    "id": "multiple-substitutes-distinct",
+    "description": "Several reasonable substitutes: closest and creative looks must differ.",
+    "inspiration": "insp_camel_work",
+    "preferences": {"occasion": "work", "fidelity": "creative"},
+    "expect": {"distinct_looks": 2}
+  },
+  {
+    "id": "missing-item-optional",
+    "description": "Missing wardrobe item: no hat owned; it must be an optional gap, never an invented garment.",
+    "inspiration": "insp_trench_travel",
+    "preferences": {"occasion": "travel", "fidelity": "close", "shopping": "secondhand_rental"},
+    "expect": {"optional_gaps": ["accessory-1"], "sourcing_hint_on_gaps": true, "no_purchase": true}
+  },
+  {
+    "id": "missing-key-piece",
+    "description": "Genuine gap: closet without any outer layer must report an essential outerwear gap.",
+    "inspiration": "insp_camel_work",
+    "wardrobe": {"only_categories": ["top", "bottom", "shoes"], "exclude_layers": ["mid"]},
+    "preferences": {"occasion": "work"},
+    "expect": {"essential_gaps": ["outerwear-1"], "purchase_needed": true}
+  },
+  {
+    "id": "formal-occasion-constraint",
+    "description": "Formal occasion: no casual sneakers, denim jacket or jeans for an evening event.",
+    "inspiration": "insp_emerald_evening",
+    "preferences": {"occasion": "event", "fidelity": "creative"},
+    "expect": {"forbidden_garments": ["s_white_sneakers", "s_denim_jacket", "s_straight_jeans"]}
+  },
+  {
+    "id": "shopping-disabled",
+    "description": "Shopping disabled: gaps carry no sourcing hints.",
+    "inspiration": "insp_trench_travel",
+    "preferences": {"occasion": "travel", "shopping": "wardrobe_first"},
+    "expect": {"no_sourcing_hints": true}
+  },
+  {
+    "id": "user-exclusion-and-keep",
+    "description": "Preference adherence: excluded pieces never appear, kept pieces always do.",
+    "inspiration": "insp_camel_work",
+    "preferences": {"occasion": "work", "exclude_garment_ids": ["s_white_tee"], "keep_garment_ids": ["s_black_boots"]},
+    "expect": {"forbidden_garments": ["s_white_tee"], "required_garments": ["s_black_boots"]}
+  },
+  {
+    "id": "ambiguous-not-an-outfit",
+    "description": "Ambiguous/non-outfit photo: no looks, honest reason.",
+    "inspiration": {"is_outfit": false, "summary": "A landscape with no visible clothing.", "formality": "casual", "pieces": []},
+    "preferences": {"occasion": "everyday"},
+    "expect": {"no_looks": true}
+  },
+  {
+    "id": "hallucinated-ids",
+    "description": "Model invents garment ids: they are removed and the slot becomes a gap.",
+    "inspiration": "insp_camel_work",
+    "preferences": {"occasion": "work"},
+    "composer_output": {"looks": [{"strategy": "closest", "title": "Invented", "items": [
+      {"garment_id": "s_camel_blazer", "replaces_slot_id": "outerwear-1", "explanation": "ok"},
+      {"garment_id": "g_nonexistent_trousers", "replaces_slot_id": "bottom-1", "explanation": "fake"},
+      {"garment_id": "s_brown_loafers", "replaces_slot_id": "shoes-1", "explanation": "ok"}]}]},
+    "expect": {"engine": "gemini", "gap_slots": ["bottom-1"]}
+  },
+  {
+    "id": "malformed-model-output",
+    "description": "Model output unusable: labelled rule-based fallback, never a fabricated AI answer.",
+    "inspiration": "insp_camel_work",
+    "preferences": {"occasion": "work"},
+    "composer_output": "__ERROR__",
+    "expect": {"engine": "rules", "engine_note_contains": "rule-based", "min_looks": 1}
+  },
+  {
+    "id": "empty-wardrobe",
+    "description": "No wardrobe: request is rejected with a clear error instead of invented looks.",
+    "inspiration": "insp_camel_work",
+    "wardrobe": {"only_categories": []},
+    "preferences": {"occasion": "work"},
+    "expect": {"error_status": 409}
+  }
+]
