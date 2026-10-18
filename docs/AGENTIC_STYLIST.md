@@ -49,6 +49,23 @@ Inspiration photo ──► Gemini analyzer ──► OutfitDNA
 
 **Why the ADK graph `Workflow`.** We use ADK 2.12's graph workflow rather than a free-running multi-agent setup. It gives explicit state (`proposal`, `pending`, `accepted`, `critique`, `revision_brief`), explicit routes (`critique` / `revise` / `done`), per-node retries on 429s and transient errors, and a hard bound on the loop. Only the two genuinely creative and judgemental steps are LLM agents. Everything else is ordinary, testable Python.
 
+## Role-level substitution
+
+Slot-by-slot retrieval treated a belted shirt-dress as a poor "shirt" and a poor "skirt", and the
+look schema could not express one garment filling two roles, so a dress covering top + skirt left
+an "essential gap". Three generic changes fix this (no garment is special-cased):
+
+- `app/pipeline/roles.py` scores one-piece garments against the inspiration's top + bottom
+  **together** (waist definition, lower line, formality, palette, style) and passes them to the
+  stylist as `multi_role_candidates` with differences and styling considerations.
+- Items carry `covers_slot_ids`; validation and impact credit every role a garment fills (only
+  one-piece garments may take on a bottom role).
+- The stylist prompt asks it to think in roles, not categories (one piece → several roles,
+  two pieces → one role).
+
+Result on the reported case: the creative look is now the belted shirt-dress + sneakers
+(critic-approved), alongside the closest sweater + wide-leg look.
+
 ## Decision rules (`on_decide`)
 
 - **Approved:** verdict `approve` with no critical issue, or verdict `revise` with only minor issues. (This guards against inconsistent verdicts.)
@@ -80,6 +97,28 @@ uv run python -m evals.compare --only real      # the team's real wardrobe (phot
 ```
 
 `evals/real_cases.json` reproduces the reported failure (white tucked shirt + denim midi skirt → a 7-piece real wardrobe) together with a material challenge, a cross-occasion case and a "no good outfit exists" case. `compare.md` reports objective checks, invalid-ID counts, latency and tokens, and lists both engines' looks side by side with blank **human rating** fields. The critic's verdicts are judgements, not quality scores.
+
+## Latency and cost (live, Gemini 2.5 Flash, 16 cases)
+
+Every generation records `timings` (per stage, both engines). Medians from `evals/results/compare.md`:
+
+| Stage | Agentic | Baseline |
+|---|---|---|
+| Deterministic retrieval | 25 ms | 22 ms |
+| Knowledge retrieval (local cards) | <1 ms | <1 ms |
+| Stylist model time (all passes) | 19.4 s | — |
+| Critic model time (all passes) | 12.6 s | — |
+| Critic image prep / images / image tokens | 54 ms / 12 / ~3.1k | — |
+| Revision passes (model time after pass 1) | 14.6 s | — |
+| Composer (single pass) | — | 10.8 s |
+| **Total** | **32 s** (max 105 s*) | **11 s** |
+
+\* one run hit the 90 s budget during Vertex 429 bursts and fell back to a labelled single pass.
+
+Ablation on the real-wardrobe cases (`agentic` vs `agentic_no_images` vs `agentic_no_revision`):
+images add ~20 ms and ~1k tokens with no measurable latency cost; the stylist is ~60 % of model
+time and the critic ~40 %; one revision round adds ~7 s median but roughly doubles the looks that
+pass the critic. Default: one revision round, images on.
 
 ## Optional web search (not enabled)
 

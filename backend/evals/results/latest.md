@@ -10,18 +10,18 @@ Checks are deterministic. Candidate `score` values are heuristic ranking signals
 | Case | Result | Failed checks | Latency |
 |---|---|---|---|
 | exact-camel-work | PASS | — | 31 ms |
-| same-silhouette-different-colour | PASS | — | 23 ms |
-| aesthetic-substitute-weekend | PASS | — | 21 ms |
+| same-silhouette-different-colour | PASS | — | 24 ms |
+| aesthetic-substitute-weekend | PASS | — | 22 ms |
 | category-substitute-dress | PASS | — | 13 ms |
-| multiple-substitutes-distinct | PASS | — | 29 ms |
+| multiple-substitutes-distinct | PASS | — | 25 ms |
 | missing-item-optional | PASS | — | 25 ms |
 | missing-key-piece | PASS | — | 11 ms |
 | formal-occasion-constraint | PASS | — | 14 ms |
 | shopping-disabled | PASS | — | 25 ms |
-| user-exclusion-and-keep | PASS | — | 23 ms |
+| user-exclusion-and-keep | PASS | — | 24 ms |
 | ambiguous-not-an-outfit | PASS | — | 0 ms |
-| hallucinated-ids | PASS | — | 22 ms |
-| malformed-model-output | PASS | — | 24 ms |
+| hallucinated-ids | PASS | — | 23 ms |
+| malformed-model-output | PASS | — | 25 ms |
 | empty-wardrobe | PASS | — | 0 ms |
 
 ## Looks for human review

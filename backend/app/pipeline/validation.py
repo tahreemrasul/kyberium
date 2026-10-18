@@ -153,6 +153,20 @@ def build_look(
             )
         )
 
+    # Two-piece completion: if a dress slot is filled by only a top or only a bottom, an otherwise
+    # unassigned complementary piece is the other half of that two-piece (models often leave it unlabelled).
+    for idx, it in enumerate(items):
+        if it.replaces_slot_id is not None or it.covers_slot_ids or it.garment.category not in ("top", "bottom"):
+            continue
+        partner_cat = "bottom" if it.garment.category == "top" else "top"
+        for other in items:
+            slot_id = other.replaces_slot_id
+            if slot_id in slots and slots[slot_id].category == "dress" and other.garment.category == partner_cat:
+                items[idx] = it.model_copy(
+                    update={"replaces_slot_id": slot_id, "replaces_description": slots[slot_id].description}
+                )
+                break
+
     # "Keep this piece" is a hard user constraint: if the composer dropped a kept garment,
     # put it back in place of the item in the same category (or in a slot it fits).
     for gid in prefs.keep_garment_ids:
