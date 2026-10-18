@@ -46,9 +46,29 @@ def is_essential(piece: InspirationPiece) -> bool:
     return piece.importance == "key" and piece.category not in ("accessory",)
 
 
+def covered_slots(items: list[LookItem]) -> set[str]:
+    out: set[str] = set()
+    for i in items:
+        if i.replaces_slot_id:
+            out.add(i.replaces_slot_id)
+        out.update(i.covers_slot_ids)
+    return out
+
+
+def _may_cover(g: Garment, piece: InspirationPiece) -> bool:
+    """Which extra roles a garment can plausibly take on besides its main one."""
+    if g.category == piece.category:
+        return True
+    if g.category == "dress":
+        return piece.category in ("top", "bottom")
+    if g.category in ("top", "outerwear"):
+        return piece.category in ("top", "outerwear")
+    return False
+
+
 def compute_impact(items: list[LookItem], gaps: list[LookGap], analysis: InspirationAnalysis) -> ImpactSummary:
     total = len(analysis.pieces)
-    covered = len({i.replaces_slot_id for i in items if i.replaces_slot_id})
+    covered = len(covered_slots(items))
     essential = sum(1 for g in gaps if g.essential)
     owned = len(items)
     if not gaps:
@@ -108,18 +128,44 @@ def build_look(
                 continue
             single_used.add(g.category)
         slot = ci.replaces_slot_id if ci.replaces_slot_id in slots else None
+        # One garment may fill several roles (a shirt-dress for top + skirt). Only one-piece garments
+        # may also cover a bottom, so a top can never "cover" the trousers.
+        extra = [
+            s_id
+            for s_id in dict.fromkeys(ci.covers_slot_ids)
+            if s_id in slots and s_id != slot and _may_cover(g, slots[s_id])
+        ]
+        if slot is None and extra:
+            slot, extra = extra[0], extra[1:]
         used.add(g.id)
+        descs = [slots[x].description for x in ([slot] if slot else []) + extra]
         items.append(
             LookItem(
                 garment_id=g.id,
                 garment=g,
                 replaces_slot_id=slot,
-                replaces_description=slots[slot].description if slot else None,
+                covers_slot_ids=extra,
+                replaces_description=" + ".join(descs) if descs else None,
                 explanation=ci.explanation.strip() or f"{g.name} completes the look.",
                 preserved=[s for s in ci.preserved if s.strip()][:5],
                 changed=[s for s in ci.changed if s.strip()][:5],
+                role=(ci.role or "").strip() or None,
             )
         )
+
+    # Two-piece completion: if a dress slot is filled by only a top or only a bottom, an otherwise
+    # unassigned complementary piece is the other half of that two-piece (models often leave it unlabelled).
+    for idx, it in enumerate(items):
+        if it.replaces_slot_id is not None or it.covers_slot_ids or it.garment.category not in ("top", "bottom"):
+            continue
+        partner_cat = "bottom" if it.garment.category == "top" else "top"
+        for other in items:
+            slot_id = other.replaces_slot_id
+            if slot_id in slots and slots[slot_id].category == "dress" and other.garment.category == partner_cat:
+                items[idx] = it.model_copy(
+                    update={"replaces_slot_id": slot_id, "replaces_description": slots[slot_id].description}
+                )
+                break
 
     # "Keep this piece" is a hard user constraint: if the composer dropped a kept garment,
     # put it back in place of the item in the same category (or in a slot it fits).
@@ -155,7 +201,7 @@ def build_look(
         return None
     items.sort(key=lambda it: _DISPLAY_ORDER.get(it.garment.category, 9))
 
-    covered = {i.replaces_slot_id for i in items if i.replaces_slot_id}
+    covered = covered_slots(items)
     gaps: list[LookGap] = []
     model_gaps = {cg.slot_id: cg for cg in composed.gaps if cg.slot_id in slots}
     for slot_id, piece in slots.items():
@@ -190,6 +236,10 @@ def build_look(
         styling_tip=composed.styling_tip,
         impact=compute_impact(items, gaps, analysis),
         warnings=list(dict.fromkeys(warnings)),
+        coherence=(composed.coherence or "").strip() or None,
+        styling_instructions=[x for x in composed.styling_instructions if x.strip()][:5],
+        preserved_traits=[x for x in composed.preserved_traits if x.strip()][:6],
+        deviations=[x for x in composed.deviations if x.strip()][:5],
     )
 
 

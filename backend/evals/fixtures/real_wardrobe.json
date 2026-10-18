@@ -1,0 +1,168 @@
+[
+  {
+    "id": "r_black_sweater",
+    "image_file": "black shirt.png",
+    "name": "Black crewneck sweater",
+    "category": "top",
+    "subcategory": "sweater",
+    "colors": [
+      "black"
+    ],
+    "silhouette": "relaxed fit",
+    "pattern": "solid",
+    "formality": "casual",
+    "layer": "mid",
+    "style_tags": [
+      "minimalist",
+      "cozy"
+    ],
+    "occasions": [
+      "everyday",
+      "travel"
+    ],
+    "material_appearance": "appears to be a matte knit"
+  },
+  {
+    "id": "r_black_jeans",
+    "image_file": "black_jeans.webp",
+    "name": "Black high-rise wide-leg jeans",
+    "category": "bottom",
+    "subcategory": "jeans",
+    "colors": [
+      "black"
+    ],
+    "silhouette": "high-rise wide-leg",
+    "pattern": "solid",
+    "formality": "casual",
+    "layer": "none",
+    "style_tags": [
+      "denim",
+      "palazzo"
+    ],
+    "occasions": [
+      "everyday",
+      "travel"
+    ],
+    "material_appearance": "appears to be a matte denim"
+  },
+  {
+    "id": "r_camel_shirtdress",
+    "image_file": "dress.webp",
+    "name": "Tan belted shirt dress",
+    "category": "dress",
+    "subcategory": "shirt dress",
+    "colors": [
+      "tan",
+      "brown"
+    ],
+    "silhouette": "relaxed fit with a-line skirt",
+    "pattern": null,
+    "formality": "smart_casual",
+    "layer": "base",
+    "style_tags": [
+      "shirt dress",
+      "belted"
+    ],
+    "occasions": [
+      "work",
+      "everyday",
+      "travel"
+    ],
+    "material_appearance": "appears to be a matte woven fabric"
+  },
+  {
+    "id": "r_rust_suede_jacket",
+    "image_file": "jacket.png",
+    "name": "Rust suede-like jacket",
+    "category": "outerwear",
+    "subcategory": "jacket",
+    "colors": [
+      "rust",
+      "brown"
+    ],
+    "silhouette": "relaxed fit",
+    "pattern": "solid",
+    "formality": "casual",
+    "layer": "outer",
+    "style_tags": [
+      "utility",
+      "overshirt"
+    ],
+    "occasions": [
+      "everyday",
+      "travel"
+    ],
+    "material_appearance": "appears to be a matte suede-like fabric"
+  },
+  {
+    "id": "r_burgundy_satin_skirt",
+    "image_file": "skirt.png",
+    "name": "Burgundy satin midi skirt",
+    "category": "bottom",
+    "subcategory": "skirt",
+    "colors": [
+      "burgundy"
+    ],
+    "silhouette": "midi-length, A-line",
+    "pattern": "solid",
+    "formality": "smart_casual",
+    "layer": "none",
+    "style_tags": [
+      "satin skirt",
+      "slip skirt"
+    ],
+    "occasions": [
+      "everyday",
+      "event"
+    ],
+    "material_appearance": "appears to be a satin weave with a lustrous finish"
+  },
+  {
+    "id": "r_cream_tweed_jacket",
+    "image_file": "sweater.webp",
+    "name": "Cream embellished tweed jacket",
+    "category": "outerwear",
+    "subcategory": "jacket",
+    "colors": [
+      "cream",
+      "gold"
+    ],
+    "silhouette": "cropped, collarless",
+    "pattern": null,
+    "formality": "smart_casual",
+    "layer": "outer",
+    "style_tags": [
+      "tweed",
+      "embellished"
+    ],
+    "occasions": [
+      "event"
+    ],
+    "material_appearance": "textured tweed with metallic embellishments"
+  },
+  {
+    "id": "r_platform_sneakers",
+    "image_file": null,
+    "name": "White and black platform sneakers",
+    "category": "shoes",
+    "subcategory": "sneakers",
+    "colors": [
+      "white",
+      "black"
+    ],
+    "silhouette": "chunky platform sole",
+    "pattern": "colour-block",
+    "formality": "casual",
+    "layer": "none",
+    "style_tags": [
+      "casual",
+      "streetwear",
+      "modern"
+    ],
+    "occasions": [
+      "everyday",
+      "travel"
+    ],
+    "material_appearance": "appears to be smooth leather"
+  }
+]

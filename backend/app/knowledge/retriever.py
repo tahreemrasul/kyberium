@@ -44,6 +44,7 @@ class FashionKnowledgeHit(BaseModel):
     text: str
     score: float | None = None  # ranking value, not a probability of correctness
     tags: list[str] = Field(default_factory=list)
+    collection: str | None = None  # "Rewear Styling Principles" | "Fashion Encyclopedia" | future index name
     source_title: str | None = None
     source_url: str | None = None
     license: str | None = None
@@ -117,6 +118,7 @@ class LocalFashionKnowledgeRetriever:
                 text=r["text"],
                 score=round(s / best, 3),
                 tags=r.get("tags", []),
+                collection=r.get("collection") or "Rewear Styling Principles",
                 source_title=r.get("source_title"),
                 source_url=r.get("source_url"),
                 license=r.get("license"),
@@ -153,7 +155,14 @@ async def safe_search(
         return []
 
 
-def build_query(analysis: InspirationAnalysis, prefs: StylePreferences) -> FashionKnowledgeQuery:
+def build_query(
+    analysis: InspirationAnalysis, prefs: StylePreferences, candidates: dict[str, list] | None = None
+) -> FashionKnowledgeQuery:
+    """Problem-driven query: what must be preserved, and which substitutions make that hard.
+
+    e.g. "Preserve: defined waist, relaxed but put-together. Challenges: fluid satin instead of
+    structured denim for the denim midi skirt; reads dressier than the original piece."
+    """
     concepts = ["silhouette", "proportion", "palette"]
     if analysis.layering or any(p.layer in ("mid", "outer") for p in analysis.pieces):
         concepts.append("layering")
@@ -161,13 +170,35 @@ def build_query(analysis: InspirationAnalysis, prefs: StylePreferences) -> Fashi
         concepts.append("substitution")
     tags = list(analysis.aesthetic)
     for p in analysis.pieces:
-        tags.extend(t for t in [p.subcategory, p.silhouette] if t)
+        tags.extend(t for t in [p.subcategory, p.silhouette, p.material_appearance] if t)
+    challenges: list[str] = []
+    for p in analysis.pieces:
+        top = (candidates or {}).get(p.slot_id) or []
+        if top and top[0].differences:
+            challenges.append(f"{'; '.join(top[0].differences[:2])} for the {p.description.rstrip('.').lower()}")
+    joined = " ".join(challenges).lower()
+    for word, concept in (
+        ("drape", "texture"),
+        ("finish", "texture"),
+        ("dressier", "formality"),
+        ("casual", "formality"),
+        ("volume", "proportion"),
+        ("contrast", "contrast"),
+        ("length", "length"),
+    ):
+        if word in joined and concept not in concepts:
+            concepts.append(concept)
+    text = analysis.summary
+    if analysis.essential_traits:
+        text += " Preserve: " + ", ".join(analysis.essential_traits[:4]) + "."
+    if challenges:
+        text += " Challenges: " + " | ".join(challenges[:3]) + "."
     return FashionKnowledgeQuery(
         concepts=concepts,
         occasion=prefs.occasion,
         garment_categories=sorted({p.category for p in analysis.pieces}),
-        style_tags=tags[:12],
-        text=analysis.summary,
+        style_tags=tags[:14],
+        text=text,
     )
 
 
@@ -177,6 +208,10 @@ def get_retriever() -> FashionKnowledgeRetriever:
     if s.fashion_knowledge_backend == "local":
         path = s.fashion_knowledge_path or DEFAULT_DATASET
         try:
+            if str(path).endswith(".jsonl"):  # the team's Rewear Fashion Knowledge corpus (schema v0.1.0)
+                from app.knowledge.corpus import CorpusFashionKnowledgeRetriever
+
+                return CorpusFashionKnowledgeRetriever.from_path(path)
             return LocalFashionKnowledgeRetriever.from_path(path)
         except Exception as exc:
             log.warning("could not load knowledge dataset %s: %s", path, exc)

@@ -159,3 +159,14 @@ def test_rule_composer_reports_gap_when_role_missing(wardrobe):
     looks = build_looks(compose_with_rules(CAMEL, prefs, cands, no_outer).looks, no_outer, CAMEL, prefs)
     gap = next(g for g in looks[0].gaps if g.slot_id == "outerwear-1")
     assert gap.essential and looks[0].impact.purchase_needed
+
+
+def test_unlabelled_half_of_a_two_piece_is_attached_to_the_dress_slot(wardrobe):
+    composed = ComposedLook(
+        strategy="creative",
+        title="Two-piece",
+        items=[item("s_satin_skirt", "dress-1"), ComposedItem(garment_id="s_black_cami", explanation="x")],
+    )
+    look = build_look(composed, wardrobe, EVENING, StylePreferences(occasion="event"))
+    cami = next(i for i in look.items if i.garment_id == "s_black_cami")
+    assert cami.replaces_slot_id == "dress-1"

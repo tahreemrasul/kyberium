@@ -20,7 +20,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Nav />
           <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-20 sm:px-8">{children}</main>
           <footer className="border-t border-line/70 py-6 text-center text-xs text-muted">
-            Rewear · Team Kyberium · Reuse first, your choice always.
+            Rewear · Team Kyberium · The most sustainable outfit is the one you already own.
           </footer>
         </AppProvider>
       </body>

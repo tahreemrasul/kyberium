@@ -44,6 +44,43 @@ async def test_local_respects_occasion_filter():
     assert [h.id for h in hits] == ["b"]
 
 
+async def test_corpus_retriever_keeps_conditions_and_provenance():
+    from app.knowledge.corpus import CorpusFashionKnowledgeRetriever
+
+    records = [
+        {
+            "id": "K1",
+            "topic": "textile",
+            "subtopic": "denim_to_satin",
+            "styling_principle": "Satin can replace denim when length matters more than structure.",
+            "applicable_conditions": ["The skirt is not defined by rigid seams."],
+            "counterexamples_or_failure_conditions": ["Adds gloss that reads too dressy."],
+            "practical_styling_adjustments": ["Pair with a matte knit and flat shoes."],
+            "relevant_attributes": ["drape", "sheen"],
+            "applicable_garment_categories": ["skirt"],
+            "styles_aesthetics": ["any"],
+            "occasions": ["any"],
+            "claim_type": "styling_synthesis",
+            "review_status": "desk_reviewed_not_expert_validated",
+            "sources": [{"title": "Source A", "url": "https://example.org/a", "rights_status": "not_established"}],
+        },
+        {
+            "id": "K2",
+            "topic": "color",
+            "subtopic": "neutrals",
+            "styling_principle": "Neutral is a role, not a colour.",
+            "occasions": ["work"],
+            "sources": [],
+        },
+    ]
+    r = CorpusFashionKnowledgeRetriever(records)
+    hits = await r.search(FashionKnowledgeQuery(text="replace a denim skirt with a satin skirt", concepts=["texture"]))
+    assert hits[0].id == "K1"
+    assert "May fail when" in hits[0].text and "Adjust" in hits[0].text  # conditions travel with the principle
+    assert hits[0].source_url == "https://example.org/a" and "not_established" in hits[0].license
+    assert await r.search(FashionKnowledgeQuery()) == []
+
+
 class Slow:
     name = "slow"
 

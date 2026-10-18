@@ -17,7 +17,7 @@ Browser ──► Next.js (Cloud Run) ──/api proxy──► FastAPI (Cloud R
                                                      └─► FashionKnowledgeRetriever (none | local | vector)
 ```
 
-The pipeline is one orchestrated flow (`backend/app/pipeline/orchestrator.py`), not a swarm of agents:
+The pipeline is one orchestrated flow (`backend/app/pipeline/orchestrator.py`). Outfit composition now runs as a bounded **Google ADK stylist → critic → refinement workflow**. See [docs/AGENTIC_STYLIST.md](docs/AGENTIC_STYLIST.md) for the architecture, decision rules, configuration and the live baseline comparison. The steps:
 
 1. **Garment understanding:** a photo goes to Gemini, which returns a validated `GarmentDraft`. Results are cached by image hash, prompt version and model. The user confirms or edits the tags.
 2. **Inspiration understanding:** Gemini splits the outfit into slots (`outerwear-1`, `top-1`…) and describes proportions, layering, palette, formality and occasions. Hidden pieces are flagged rather than invented.

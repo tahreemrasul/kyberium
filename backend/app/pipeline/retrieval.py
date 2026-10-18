@@ -18,6 +18,7 @@ from app.pipeline.attributes import (
     style_similarity,
     subtype_similarity,
 )
+from app.pipeline.comparison import compare
 from app.schemas import CandidateMatch, Garment, InspirationAnalysis, InspirationPiece, StylePreferences
 
 WEIGHTS: dict[str, dict[str, float]] = {
@@ -25,6 +26,8 @@ WEIGHTS: dict[str, dict[str, float]] = {
     "aesthetic": {"color": 0.15, "silhouette": 0.27, "subtype": 0.15, "formality": 0.18, "style": 0.25},
     "creative": {"color": 0.05, "silhouette": 0.27, "subtype": 0.08, "formality": 0.25, "style": 0.35},
 }
+# Material/texture similarity (drape, finish) — a small extra signal, strongest for close matches.
+MATERIAL_WEIGHT = {"close": 0.12, "aesthetic": 0.08, "creative": 0.03}
 MIN_SCORE = 0.35
 TOP_K = 5
 
@@ -51,6 +54,9 @@ class Scored:
     garment: Garment
     score: float
     reasons: list[str]
+    matching: list[str]
+    differences: list[str]
+    considerations: list[str]
 
 
 def score_garment(piece: InspirationPiece, g: Garment, prefs: StylePreferences) -> Scored | None:
@@ -69,7 +75,9 @@ def score_garment(piece: InspirationPiece, g: Garment, prefs: StylePreferences) 
         "formality": formality_similarity(piece.formality, g.formality),
         "style": style_similarity(piece.style_tags, g.style_tags),
     }
-    score = sum(w[k] * v for k, v in sims.items()) * factor * (1.0 if fit == "good" else 0.88)
+    cmp = compare(piece, g)
+    score = sum(w[k] * v for k, v in sims.items()) + MATERIAL_WEIGHT[prefs.fidelity] * cmp.material_similarity
+    score = score * factor * (1.0 if fit == "good" else 0.88)
     if g.id in prefs.keep_garment_ids:
         score = min(1.0, score + 0.25)
 
@@ -92,7 +100,7 @@ def score_garment(piece: InspirationPiece, g: Garment, prefs: StylePreferences) 
         reasons.append("shared style: " + ", ".join(shared[:3]))
     if fit == "good":
         reasons.append(f"suits {prefs.occasion}")
-    return Scored(g, round(min(score, 1.0), 3), reasons)
+    return Scored(g, round(min(score, 1.0), 3), reasons, cmp.matching, cmp.differences, cmp.considerations)
 
 
 def rank_candidates(
@@ -107,7 +115,15 @@ def rank_candidates(
         rest.sort(key=lambda s: (-s.score, s.garment.id))
         kept.sort(key=lambda s: (-s.score, s.garment.id))
         out[piece.slot_id] = [
-            CandidateMatch(garment_id=s.garment.id, slot_id=piece.slot_id, score=s.score, reasons=s.reasons)
+            CandidateMatch(
+                garment_id=s.garment.id,
+                slot_id=piece.slot_id,
+                score=s.score,
+                reasons=s.reasons,
+                matching_attributes=s.matching,
+                differences=s.differences,
+                styling_considerations=s.considerations,
+            )
             for s in (kept + rest)[: max(top_k, len(kept))]
         ]
     return out

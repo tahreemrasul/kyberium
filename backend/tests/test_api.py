@@ -65,7 +65,8 @@ def test_upload_tag_confirm_edit_delete_with_ai(client, auth):
     assert first["engine"] == "gemini" and first["draft"]["category"] == "outerwear" and not first["cached"]
     again = client.post("/wardrobe/items/analyze", headers=h, files={"file": ("a.png", image_bytes(), "image/png")})
     assert again.json()["cached"] is True  # same image is not re-analysed
-    assert len(client.state["ai"].calls) == 1
+    assert [c["schema"] for c in client.state["ai"].calls].count("GarmentDraft") == 1
+    assert first["display_url"].endswith("_cut.png") and client.get(first["display_url"]).status_code == 200
 
     created = client.post(
         "/wardrobe/items", headers=h, json={**DRAFT, "name": "My overshirt", "upload_id": first["upload_id"]}

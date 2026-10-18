@@ -31,6 +31,25 @@ def main() -> None:
         )
     print(f"wrote {len(SAMPLE_GARMENTS)} garment svgs")
 
+    # Raster copies for the multimodal critic (Gemini does not accept SVG).
+    pdir = ASSETS / "garments_png"
+    pdir.mkdir(exist_ok=True)
+    for g in SAMPLE_GARMENTS:
+        subprocess.run(
+            [
+                CHROME,
+                "--headless=new",
+                "--disable-gpu",
+                "--hide-scrollbars",
+                f"--screenshot={pdir / (g['id'] + '.png')}",
+                "--window-size=400,500",
+                f"file://{gdir / (g['id'] + '.svg')}",
+            ],
+            check=True,
+            capture_output=True,
+        )
+    print(f"wrote {len(SAMPLE_GARMENTS)} garment pngs")
+
     with tempfile.TemporaryDirectory() as tmp:
         for insp in SAMPLE_INSPIRATIONS:
             svg = composite_svg(insp["placements"])

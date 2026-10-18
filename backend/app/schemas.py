@@ -18,7 +18,8 @@ Occasion = Literal["work", "everyday", "event", "travel"]
 Fidelity = Literal["close", "aesthetic", "creative"]
 Shopping = Literal["wardrobe_first", "secondhand_rental", "open_to_new"]
 Strategy = Literal["closest", "creative", "alternative"]
-Engine = Literal["gemini", "rules"]
+# "agentic" = ADK stylist–critic workflow; "gemini" = single-pass composer; "rules" = labelled fallback
+Engine = Literal["agentic", "gemini", "rules"]
 
 CATEGORIES: tuple[str, ...] = ("top", "bottom", "outerwear", "dress", "shoes", "accessory")
 
@@ -107,6 +108,9 @@ class GarmentAnalysis(ApiModel):
 
     upload_id: str
     image_url: str
+    display_url: str | None = Field(
+        default=None, description="Garment cut out / cropped and placed at a standard scale on the studio background"
+    )
     draft: GarmentDraft | None
     engine: Literal["gemini", "none"]
     cached: bool = False
@@ -134,7 +138,7 @@ class GarmentUpdate(ApiModel):
 class Garment(GarmentAttributes):
     id: str
     image_url: str
-    image_kind: Literal["photo", "illustration"] = "photo"
+    image_kind: Literal["photo", "cutout", "illustration"] = "photo"
     source: Literal["upload", "sample"] = "upload"
     verified_by_user: bool = True
     created_at: datetime
@@ -159,6 +163,11 @@ class InspirationPiece(ApiModel):
     style_tags: list[str] = Field(default_factory=list)
     visibility: Literal["clear", "partial", "obscured"] = "clear"
     importance: Literal["key", "supporting"] = "key"
+    material_appearance: str | None = Field(default=None, description="e.g. rigid mid-wash denim, fluid satin")
+    fit_volume: str | None = Field(default=None, description="e.g. cropped and boxy, fitted, voluminous")
+    styling_details: list[str] = Field(
+        default_factory=list, description="How it is worn, e.g. 'tucked in', 'sleeves rolled', 'worn open'"
+    )
 
     @field_validator("colors", "style_tags")
     @classmethod
@@ -177,6 +186,23 @@ class InspirationAnalysis(ApiModel):
     occasions: list[Occasion] = Field(default_factory=list)
     pieces: list[InspirationPiece] = Field(default_factory=list, max_length=8)
     ambiguities: list[str] = Field(default_factory=list, max_length=6)
+    # --- Outfit DNA: what makes the look work, beyond individual garments ---------
+    essential_traits: list[str] = Field(
+        default_factory=list,
+        description="Characteristics the look loses its identity without, e.g. 'defined waist', "
+        "'elongated lower half', 'relaxed but put-together'",
+    )
+    flexible_traits: list[str] = Field(
+        default_factory=list,
+        description="What can change without losing the aesthetic, e.g. 'exact skirt colour', 'sneaker brand'",
+    )
+    waist_definition: str | None = Field(default=None, description="Where/how the waist is marked, or 'undefined'")
+    volume_balance: str | None = Field(default=None, description="How volume is distributed top vs bottom")
+    color_contrast: str | None = Field(default=None, description="e.g. 'high: crisp white against mid blue'")
+    materials: list[str] = Field(default_factory=list, description="Visible fabric appearances and their interplay")
+    styling_details: list[str] = Field(
+        default_factory=list, description="Outfit-level styling moves, e.g. 'shirt fully tucked', 'sleeves pushed up'"
+    )
 
     @field_validator("aesthetic", "palette")
     @classmethod
@@ -226,13 +252,32 @@ class CandidateMatch(ApiModel):
     slot_id: str
     score: float = Field(description="Relative ranking value in [0,1]. NOT a probability.")
     reasons: list[str]
+    matching_attributes: list[str] = Field(default_factory=list)
+    differences: list[str] = Field(default_factory=list)
+    styling_considerations: list[str] = Field(default_factory=list)
+
+
+class RoleCandidate(ApiModel):
+    """One owned garment that can fill SEVERAL inspiration roles at once (e.g. a dress for top + skirt)."""
+
+    garment_id: str
+    covers_slot_ids: list[str]
+    score: float = Field(description="Relative ranking value in [0,1]. NOT a probability.")
+    matching_attributes: list[str] = Field(default_factory=list)
+    differences: list[str] = Field(default_factory=list)
+    styling_considerations: list[str] = Field(default_factory=list)
 
 
 class ComposedItem(ApiModel):
     garment_id: str
     replaces_slot_id: str | None = Field(
-        description="Inspiration slot this garment stands in for; null if an added piece"
+        default=None, description="Inspiration slot this garment stands in for; null if an added piece"
     )
+    covers_slot_ids: list[str] = Field(
+        default_factory=list,
+        description="Other inspiration slots this ONE garment also fulfils (e.g. a shirt-dress: top-1 and bottom-1)",
+    )
+    role: str | None = Field(default=None, description="The garment's job in this outfit, e.g. 'crisp base layer'")
     explanation: str
     preserved: list[str] = Field(default_factory=list)
     changed: list[str] = Field(default_factory=list)
@@ -251,11 +296,86 @@ class ComposedLook(ApiModel):
     gaps: list[ComposedGap] = Field(default_factory=list)
     why_it_works: list[str] = Field(default_factory=list)
     styling_tip: str | None = None
+    coherence: str | None = Field(
+        default=None, description="How the pieces work TOGETHER: silhouette, proportion, palette, texture, formality"
+    )
+    styling_instructions: list[str] = Field(
+        default_factory=list, description="Actionable wearing instructions, e.g. 'front-tuck the sweater'"
+    )
+    preserved_traits: list[str] = Field(default_factory=list, description="Inspiration essential traits kept")
+    deviations: list[str] = Field(default_factory=list, description="Significant intentional differences")
 
 
 class CompositionResult(ApiModel):
     looks: list[ComposedLook]
     no_match_reason: str | None = None
+
+
+# ---------------------------------------------------------------------------
+# Fashion critic
+# ---------------------------------------------------------------------------
+
+Criterion = Literal[
+    "coherence",
+    "proportion",
+    "compatibility",
+    "color_texture",
+    "fidelity",
+    "preferences",
+    "occasion",
+    "creativity",
+    "sustainability",
+]
+
+
+class CriticIssue(ApiModel):
+    criterion: Criterion
+    severity: Literal["minor", "major", "critical"]
+    problem: str
+    suggested_fix: str | None = None
+    fixable_with_wardrobe: bool = Field(
+        default=True,
+        description="False if no owned garment or styling change could fix it (e.g. the colour simply isn't owned)",
+    )
+
+
+class LookEvaluation(ApiModel):
+    look_index: int = Field(description="Index of the look in the list under review (0-based)")
+    verdict: Literal["approve", "revise", "reject"]
+    strengths: list[str] = Field(default_factory=list)
+    issues: list[CriticIssue] = Field(default_factory=list)
+
+
+class CriticReport(ApiModel):
+    evaluations: list[LookEvaluation]
+    summary: str
+
+
+class LookReview(ApiModel):
+    """The critic's verdict as shown to users (ratings are not objective quality scores)."""
+
+    verdict: Literal["approve", "revise", "reject"]
+    strengths: list[str] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list, description="Minor issues the critic accepted")
+    rounds: int = Field(default=0, description="Refinement rounds this look went through")
+
+
+class TraceStep(ApiModel):
+    step: str
+    round: int
+    summary: str
+    details: list[str] = Field(default_factory=list)
+    latency_ms: int | None = None
+    tokens: int | None = None
+
+
+class StylingTrace(ApiModel):
+    engine: str
+    rounds: int
+    steps: list[TraceStep] = Field(default_factory=list)
+    total_latency_ms: int | None = None
+    total_tokens: int | None = None
+    final_decision: str | None = None
 
 
 class LookItem(ApiModel):
@@ -266,6 +386,8 @@ class LookItem(ApiModel):
     explanation: str
     preserved: list[str]
     changed: list[str]
+    role: str | None = None
+    covers_slot_ids: list[str] = Field(default_factory=list)
 
 
 class LookGap(ApiModel):
@@ -299,11 +421,17 @@ class Look(ApiModel):
     styling_tip: str | None
     impact: ImpactSummary
     warnings: list[str] = Field(default_factory=list)
+    coherence: str | None = None
+    styling_instructions: list[str] = Field(default_factory=list)
+    preserved_traits: list[str] = Field(default_factory=list)
+    deviations: list[str] = Field(default_factory=list)
+    review: LookReview | None = None
 
 
 class KnowledgeHitRef(ApiModel):
     id: str
     text: str
+    collection: str | None = None
     source_title: str | None = None
     source_url: str | None = None
 
@@ -322,6 +450,10 @@ class Generation(ApiModel):
     engine_note: str | None = None
     no_match_reason: str | None = None
     knowledge: list[KnowledgeHitRef] = Field(default_factory=list)
+    trace: StylingTrace | None = None
+    timings: dict[str, int] = Field(
+        default_factory=dict, description="Per-stage latency (ms) and token/image counts, for cost analysis"
+    )
     created_at: datetime
 
 

@@ -1,0 +1,106 @@
+[
+  {
+    "id": "real-denim-skirt",
+    "description": "The reported failure: white tucked button-down + high-waisted denim midi skirt + sneakers, styled from a real 7-piece wardrobe with no white shirt or denim skirt. A strong answer protects the defined waist and relaxed mood (e.g. the belted shirt-dress, or sweater + skirt with a tuck and casual shoes) instead of stacking dressy substitutes and an unneeded jacket.",
+    "wardrobe": {"fixture": "real"},
+    "inspiration": {
+      "is_outfit": true,
+      "summary": "A crisp white button-down shirt tucked into a high-waisted mid-blue denim midi skirt with a front slit, finished with casual white sneakers — relaxed, chic and modern.",
+      "aesthetic": ["relaxed", "chic", "modern"],
+      "palette": ["white", "mid blue"],
+      "proportions": "Relaxed shirt tucked into a high-waisted midi skirt: defined waist with a long lower line; the slit adds movement.",
+      "layering": "No outer layer; a single crisp base layer.",
+      "formality": "casual",
+      "occasions": ["everyday", "work"],
+      "pieces": [
+        {"slot_id": "top-1", "category": "top", "description": "White cotton button-down shirt", "subcategory": "shirt", "colors": ["white"], "silhouette": "relaxed", "formality": "smart_casual", "layer": "base", "style_tags": ["classic", "crisp"], "material_appearance": "crisp cotton poplin", "fit_volume": "relaxed through the body", "styling_details": ["tucked in", "sleeves rolled"]},
+        {"slot_id": "bottom-1", "category": "bottom", "description": "High-waisted mid-blue denim midi skirt with front slit", "subcategory": "skirt", "colors": ["mid blue"], "silhouette": "high-rise A-line midi", "formality": "casual", "layer": "none", "style_tags": ["casual", "modern"], "material_appearance": "rigid mid-wash denim", "fit_volume": "streamlined, midi length", "styling_details": ["front slit"]},
+        {"slot_id": "shoes-1", "category": "shoes", "description": "White low-top sneakers", "subcategory": "sneakers", "colors": ["white"], "silhouette": "low-top", "formality": "casual", "layer": "none", "style_tags": ["casual", "minimal"], "material_appearance": "smooth leather", "fit_volume": "low profile", "styling_details": []}
+      ],
+      "essential_traits": ["defined waist", "elongated midi lower line", "relaxed but put-together", "light top against a mid-tone bottom"],
+      "flexible_traits": ["exact skirt colour", "exact fabric", "sneaker style", "accessories"],
+      "waist_definition": "marked at the natural waist by the tucked shirt and high-rise skirt",
+      "volume_balance": "relaxed shirt volume on top, controlled by the tuck; streamlined midi below",
+      "color_contrast": "medium-high: crisp white against mid blue",
+      "materials": ["crisp cotton against rigid denim"],
+      "styling_details": ["shirt fully tucked", "sleeves rolled"]
+    },
+    "preferences": {"occasion": "everyday", "fidelity": "aesthetic"},
+    "expect": {"min_looks": 1}
+  },
+  {
+    "id": "real-emerald-evening",
+    "description": "Evening slip dress + cropped leather jacket + heels, from the real wardrobe (satin skirt, tweed and suede jackets, no heels).",
+    "wardrobe": {"fixture": "real"},
+    "inspiration": "insp_emerald_evening",
+    "preferences": {"occasion": "event", "fidelity": "creative"},
+    "expect": {"min_looks": 1, "forbidden_garments": ["r_platform_sneakers"]}
+  },
+  {
+    "id": "real-camel-work",
+    "description": "Camel blazer + tee + straight trousers + loafers for work, from the real wardrobe (no blazer, no tee, no loafers): expect honest gaps or declared deviations.",
+    "wardrobe": {"fixture": "real"},
+    "inspiration": "insp_camel_work",
+    "preferences": {"occasion": "work", "fidelity": "close"},
+    "expect": {"honest_gap_or_none": true}
+  },
+  {
+    "id": "real-satin-material-challenge",
+    "description": "Material challenge: satin slip skirt dressed down with a slouchy sweatshirt and sneakers. The burgundy satin skirt fits; the stylist must keep the dressed-down mood.",
+    "wardrobe": {"fixture": "real"},
+    "inspiration": {
+      "is_outfit": true,
+      "summary": "A champagne satin slip midi skirt dressed down with an oversized grey crewneck sweatshirt and chunky white sneakers — off-duty, high-low contrast.",
+      "aesthetic": ["off-duty", "high-low", "relaxed"],
+      "palette": ["champagne", "heather grey", "white"],
+      "proportions": "Oversized top over a fluid midi skirt; the front of the sweatshirt is tucked to show the waist.",
+      "layering": "No outer layer.",
+      "formality": "casual",
+      "occasions": ["everyday"],
+      "pieces": [
+        {"slot_id": "top-1", "category": "top", "description": "Oversized heather grey crewneck sweatshirt", "subcategory": "sweatshirt", "colors": ["heather grey"], "silhouette": "oversized", "formality": "casual", "layer": "mid", "style_tags": ["casual", "sporty"], "material_appearance": "soft fleece jersey", "fit_volume": "oversized", "styling_details": ["front-tucked"]},
+        {"slot_id": "bottom-1", "category": "bottom", "description": "Champagne satin slip midi skirt", "subcategory": "skirt", "colors": ["champagne"], "silhouette": "bias-cut midi", "formality": "smart_casual", "layer": "none", "style_tags": ["sleek"], "material_appearance": "fluid satin", "fit_volume": "fluid, midi", "styling_details": []},
+        {"slot_id": "shoes-1", "category": "shoes", "description": "Chunky white sneakers", "subcategory": "sneakers", "colors": ["white"], "silhouette": "chunky sole", "formality": "casual", "layer": "none", "style_tags": ["casual"], "material_appearance": "leather", "fit_volume": "chunky", "styling_details": []}
+      ],
+      "essential_traits": ["high-low mix of sleek and sporty", "fluid midi skirt", "relaxed oversized top with a visible waist", "casual footwear"],
+      "flexible_traits": ["skirt colour", "top colour", "sneaker style"],
+      "waist_definition": "front tuck shows the waistband",
+      "volume_balance": "volume on top, fluid line below",
+      "color_contrast": "low: soft neutrals",
+      "materials": ["fleece against satin"],
+      "styling_details": ["sweatshirt front-tucked"]
+    },
+    "preferences": {"occasion": "everyday", "fidelity": "aesthetic"},
+    "expect": {"closest_slot_in": {"bottom-1": ["r_burgundy_satin_skirt"], "shoes-1": ["r_platform_sneakers"]}}
+  },
+  {
+    "id": "real-no-good-outfit",
+    "description": "No good outfit exists: black-tie tuxedo look from a casual 7-piece wardrobe. A good system admits the gap instead of forcing a match.",
+    "wardrobe": {"fixture": "real"},
+    "inspiration": {
+      "is_outfit": true,
+      "summary": "A black satin-lapel tuxedo jacket and matching tuxedo trousers with a white pleated-front dress shirt, black bow tie and patent oxford shoes — strict black tie.",
+      "aesthetic": ["black tie", "formal", "classic"],
+      "palette": ["black", "white"],
+      "proportions": "Sharp, fitted tailoring with a matching suit line.",
+      "layering": "Tuxedo jacket buttoned over a dress shirt.",
+      "formality": "formal",
+      "occasions": ["event"],
+      "pieces": [
+        {"slot_id": "outerwear-1", "category": "outerwear", "description": "Black tuxedo jacket with satin peak lapels", "subcategory": "tuxedo jacket", "colors": ["black"], "silhouette": "fitted, tailored", "formality": "formal", "layer": "outer", "style_tags": ["black tie"], "material_appearance": "wool suiting with satin lapels", "fit_volume": "fitted", "styling_details": ["buttoned"]},
+        {"slot_id": "top-1", "category": "top", "description": "White pleated-front dress shirt", "subcategory": "shirt", "colors": ["white"], "silhouette": "fitted", "formality": "formal", "layer": "base", "style_tags": ["black tie"], "material_appearance": "crisp cotton", "fit_volume": "fitted", "styling_details": ["tucked in"]},
+        {"slot_id": "bottom-1", "category": "bottom", "description": "Black tuxedo trousers with satin side stripe", "subcategory": "trousers", "colors": ["black"], "silhouette": "straight, tailored", "formality": "formal", "layer": "none", "style_tags": ["black tie"], "material_appearance": "wool suiting", "fit_volume": "slim", "styling_details": []},
+        {"slot_id": "shoes-1", "category": "shoes", "description": "Black patent oxford shoes", "subcategory": "oxfords", "colors": ["black"], "silhouette": "sleek", "formality": "formal", "layer": "none", "style_tags": ["black tie"], "material_appearance": "patent leather", "fit_volume": "sleek", "styling_details": []}
+      ],
+      "essential_traits": ["matching black tailoring", "crisp white shirt", "strict formality"],
+      "flexible_traits": ["lapel style"],
+      "waist_definition": "suppressed at the jacket button",
+      "volume_balance": "streamlined throughout",
+      "color_contrast": "high: black and white",
+      "materials": ["wool suiting with satin accents"],
+      "styling_details": ["jacket buttoned"]
+    },
+    "preferences": {"occasion": "event", "fidelity": "close"},
+    "expect": {"honest_gap_or_none": true, "forbidden_garments": ["r_platform_sneakers"]}
+  }
+]

@@ -1,7 +1,7 @@
 """Versioned prompt templates. Bump PROMPT_VERSION when changing behaviour;
 cached analyses are keyed by it so stale tags are not reused."""
 
-PROMPT_VERSION = "2026-10-16.3"
+PROMPT_VERSION = "2026-10-17.1"
 
 GARMENT_SYSTEM = """You are a meticulous fashion cataloguer for a digital wardrobe app.
 You receive ONE photo of a single clothing item (flat lay, hanger or worn).
@@ -33,6 +33,19 @@ and style tags. Use slot_id values like "outerwear-1", "top-1", "bottom-1", "sho
 
 Capture what makes the outfit work: proportions (e.g. "boxy cropped top over high-rise wide-leg"),
 layering, palette relationships, overall aesthetic, formality and suitable occasions.
+
+Also produce the outfit's DNA — the outfit-level qualities a stylist would protect:
+- per piece: material_appearance (how the fabric reads: rigid denim, fluid satin, chunky knit,
+  crisp cotton…), fit_volume (fitted, boxy, voluminous, cropped…), styling_details (tucked in,
+  half-tucked, sleeves rolled, worn open, belted…).
+- waist_definition (where and how the waist is marked, or "undefined"), volume_balance (how volume
+  is distributed between top and bottom), color_contrast (level and source of contrast), materials
+  (texture interplay, e.g. "crisp cotton against rigid denim"), styling_details (outfit-level moves).
+- essential_traits: 3-5 characteristics the look would lose its identity without. Think about this
+  specific image — e.g. "defined waist", "elongated lower half", "relaxed but put-together",
+  "tonal low-contrast palette". Not generic praise.
+- flexible_traits: 2-5 aspects that can change while keeping the aesthetic (e.g. "exact skirt
+  colour", "sneaker style", "individual accessories").
 
 Honesty rules:
 - Never invent garments you cannot see. If shoes or other pieces are cropped out or hidden,

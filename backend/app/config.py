@@ -26,6 +26,17 @@ class Settings(BaseSettings):
     # presented as a Gemini result.
     composer_fallback: Literal["rules", "none"] = "rules"
 
+    # --- Agentic stylist (ADK workflow) ----------------------------------------
+    # "agentic" = stylist -> validation -> critic -> bounded refinement (Google ADK)
+    # "single_pass" = the original one-call composer (baseline)
+    styling_engine: Literal["agentic", "single_pass"] = "agentic"
+    critic_enabled: bool = True
+    max_refinement_rounds: int = 1  # 0-2; each round adds a stylist + critic call (~15 s)
+    critic_uses_images: bool = True
+    agentic_timeout_s: float = 90.0
+    stylist_thinking_budget: int = 1024
+    critic_thinking_budget: int = 512
+
     # --- Persistence ----------------------------------------------------------
     storage_backend: Literal["local", "gcp"] = "local"
     local_data_dir: Path = Path(".data")

@@ -7,14 +7,15 @@ from fastapi.responses import Response
 from app.ai.client import GeminiClient
 from app.auth import get_owner
 from app.config import Settings
-from app.deps import ai_budget, ai_dep, repo_dep, retriever_dep, settings_dep
+from app.deps import ai_budget, ai_dep, blobs_dep, repo_dep, retriever_dep, settings_dep
 from app.errors import ApiError, not_found
 from app.knowledge import FashionKnowledgeRetriever
 from app.pipeline.orchestrator import load_generation, run_pipeline, save_generation
 from app.pipeline.refine import apply_plan, plan_refinement, swap_item
 from app.routers.inspirations import load_inspiration
 from app.schemas import GenerateRequest, Generation, RefineRequest, SavedLook, SavedLookCreate, SwapRequest
-from app.storage import Repository
+from app.storage import BlobStore, Repository
+from app.stylist.images import make_image_loader
 from app.wardrobe import get_garment, wardrobe_index
 
 router = APIRouter(prefix="/looks", tags=["looks"])
@@ -29,6 +30,7 @@ async def generate(
     ai: GeminiClient | None = Depends(ai_dep),
     retriever: FashionKnowledgeRetriever = Depends(retriever_dep),
     settings: Settings = Depends(settings_dep),
+    blobs: BlobStore = Depends(blobs_dep),
 ) -> Generation:
     """Recreate an analysed inspiration from the user's own wardrobe."""
     insp = await load_inspiration(repo, owner, body.inspiration_id)
@@ -36,6 +38,7 @@ async def generate(
         ai=ai,
         settings=settings,
         retriever=retriever,
+        image_loader=make_image_loader(blobs),
         wardrobe=await wardrobe_index(repo, owner),
         analysis=insp.analysis,
         prefs=body.preferences,
@@ -61,6 +64,7 @@ async def refine(
     ai: GeminiClient | None = Depends(ai_dep),
     retriever: FashionKnowledgeRetriever = Depends(retriever_dep),
     settings: Settings = Depends(settings_dep),
+    blobs: BlobStore = Depends(blobs_dep),
 ) -> Generation:
     """Turn a short request ("keep the blazer, change the trousers") into constraints and restyle."""
     gen = await load_generation(repo, owner, body.generation_id)
@@ -72,6 +76,7 @@ async def refine(
         ai=ai,
         settings=settings,
         retriever=retriever,
+        image_loader=make_image_loader(blobs),
         wardrobe=wardrobe,
         analysis=gen.analysis,
         prefs=prefs,

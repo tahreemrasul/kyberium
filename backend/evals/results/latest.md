@@ -9,19 +9,19 @@ Checks are deterministic. Candidate `score` values are heuristic ranking signals
 
 | Case | Result | Failed checks | Latency |
 |---|---|---|---|
-| exact-camel-work | PASS | — | 18 ms |
-| same-silhouette-different-colour | PASS | — | 11 ms |
-| aesthetic-substitute-weekend | PASS | — | 9 ms |
-| category-substitute-dress | PASS | — | 5 ms |
-| multiple-substitutes-distinct | PASS | — | 11 ms |
-| missing-item-optional | PASS | — | 10 ms |
-| missing-key-piece | PASS | — | 5 ms |
-| formal-occasion-constraint | PASS | — | 6 ms |
-| shopping-disabled | PASS | — | 10 ms |
-| user-exclusion-and-keep | PASS | — | 10 ms |
+| exact-camel-work | PASS | — | 31 ms |
+| same-silhouette-different-colour | PASS | — | 24 ms |
+| aesthetic-substitute-weekend | PASS | — | 22 ms |
+| category-substitute-dress | PASS | — | 13 ms |
+| multiple-substitutes-distinct | PASS | — | 25 ms |
+| missing-item-optional | PASS | — | 25 ms |
+| missing-key-piece | PASS | — | 11 ms |
+| formal-occasion-constraint | PASS | — | 14 ms |
+| shopping-disabled | PASS | — | 25 ms |
+| user-exclusion-and-keep | PASS | — | 24 ms |
 | ambiguous-not-an-outfit | PASS | — | 0 ms |
-| hallucinated-ids | PASS | — | 9 ms |
-| malformed-model-output | PASS | — | 11 ms |
+| hallucinated-ids | PASS | — | 23 ms |
+| malformed-model-output | PASS | — | 25 ms |
 | empty-wardrobe | PASS | — | 0 ms |
 
 ## Looks for human review
@@ -151,7 +151,7 @@ _Missing wardrobe item: no hat owned; it must be an optional gap, never an inven
 **Creative remix** — 4/5 inspiration pieces recreated from your closet · No purchase needed — the gaps are optional
 
 - outerwear-1 <- Black fitted blazer: Your black fitted blazer can stand in for the beige belted double-breasted trench coat — shared style: classic.
-- top-1 <- Black silk-look camisole: Your black silk-look camisole can stand in for the navy fine-knit crew-neck sweater — similar silhouette (slim, bias-cut); matching formality (smart casual).
+- top-1 <- Cream cable-knit cardigan: Your cream cable-knit cardigan can stand in for the navy fine-knit crew-neck sweater — same garment type (knit); shared style: classic.
 - bottom-1 <- Black straight-leg trousers: Your black straight-leg trousers can stand in for the ecru high-rise wide-leg trousers — same garment type (trousers); matching formality (smart casual).
 - shoes-1 <- Black leather ankle boots: Your black leather ankle boots can stand in for the white minimal sneakers — suits travel.
 - GAP accessory-1 (optional): Nothing in your closet fills the role of the Wide-brim straw-coloured hat.

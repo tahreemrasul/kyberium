@@ -177,7 +177,7 @@ export function GarmentImage({
 }: {
   src: string;
   alt: string;
-  kind?: "photo" | "illustration";
+  kind?: "photo" | "cutout" | "illustration";
   className?: string;
   contain?: boolean;
 }) {
@@ -188,7 +188,9 @@ export function GarmentImage({
         src={mediaUrl(src)}
         alt={alt}
         loading="lazy"
-        className={`h-full w-full ${contain || kind === "illustration" ? "object-contain p-[6%]" : "object-cover"}`}
+        className={`h-full w-full ${
+          kind === "cutout" ? "object-contain" : contain || kind === "illustration" ? "object-contain p-[6%]" : "object-cover"
+        }`}
       />
       {kind === "illustration" && (
         <span className="absolute bottom-2 left-2 rounded-full bg-card/85 px-2 py-0.5 text-[10px] tracking-wide text-muted">

@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from datetime import UTC, datetime
 
@@ -10,6 +11,7 @@ from app.config import Settings
 from app.deps import ai_budget, ai_dep, blobs_dep, repo_dep, settings_dep
 from app.errors import ApiError, not_found
 from app.images import normalize_image
+from app.pipeline.cutout import display_image
 from app.pipeline.garments import analyze_garment
 from app.schemas import Garment, GarmentAnalysis, GarmentCreate, GarmentUpdate
 from app.storage import BlobStore, Repository
@@ -38,6 +40,13 @@ async def analyze_item(
     upload_id = "up_" + uuid.uuid4().hex[:20]
     key = f"uploads/{owner}/{upload_id}.jpg"
     await blobs.put(key, jpeg, "image/jpeg")
+    # Tag the garment and build its standard-scale display image concurrently.
+    analysis, (display_png, method) = await asyncio.gather(
+        analyze_garment(ai, repo, owner, upload_id=upload_id, image_url=f"/media/{key}", image=jpeg, image_sha=sha),
+        display_image(ai, jpeg),
+    )
+    display_key = f"uploads/{owner}/{upload_id}_cut.png"
+    await blobs.put(display_key, display_png, "image/png")
     await repo.put(
         owner,
         UPLOADS,
@@ -45,13 +54,13 @@ async def analyze_item(
         {
             "id": upload_id,
             "image_key": key,
+            "display_key": display_key,
+            "display_method": method,
             "sha256": sha,
             "created_at": datetime.now(UTC).isoformat(),
         },
     )
-    return await analyze_garment(
-        ai, repo, owner, upload_id=upload_id, image_url=f"/media/{key}", image=jpeg, image_sha=sha
-    )
+    return analysis.model_copy(update={"display_url": f"/media/{display_key}"})
 
 
 async def _get_upload(repo: Repository, owner: str, upload_id: str) -> dict:
@@ -77,7 +86,7 @@ async def reanalyze_upload(
     blob = await blobs.get(up["image_key"])
     if blob is None:
         raise not_found("Upload image")
-    return await analyze_garment(
+    analysis = await analyze_garment(
         ai,
         repo,
         owner,
@@ -86,6 +95,8 @@ async def reanalyze_upload(
         image=blob[0],
         image_sha=up["sha256"],
     )
+    display = f"/media/{up['display_key']}" if up.get("display_key") else None
+    return analysis.model_copy(update={"display_url": display})
 
 
 @router.post("/items", response_model=Garment, status_code=201)
@@ -105,8 +116,8 @@ async def create_item(
     garment = Garment(
         **body.model_dump(exclude={"upload_id"}),
         id="g_" + uuid.uuid4().hex[:16],
-        image_url=f"/media/{up['image_key']}",
-        image_kind="photo",
+        image_url=f"/media/{up.get('display_key') or up['image_key']}",
+        image_kind="cutout" if up.get("display_key") else "photo",
         source="upload",
         verified_by_user=True,
         created_at=now,
@@ -158,5 +169,7 @@ async def delete_item(
         up = await repo.get(owner, UPLOADS, doc["upload_id"])
         if up:
             await blobs.delete(up["image_key"])
+            if up.get("display_key"):
+                await blobs.delete(up["display_key"])
             await repo.delete(owner, UPLOADS, up["id"])
     return Response(status_code=204)
